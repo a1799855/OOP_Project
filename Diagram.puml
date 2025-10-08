@@ -1,0 +1,181 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+enum GameState {
+  StartMenu
+  FactionSelect
+  MainGameScreen
+  BuildMenu
+  GameOver
+}
+
+abstract class Entity {
+  - id : int
+  - hp : int
+  - pos : float
+  - alive : bool
+  + update(dt: float) : void
+  + takeDamage(dmg: int) : void
+  + getHp() : int
+  + getPos() : float
+  + isAlive() : bool
+}
+
+class Unit {
+  - atk : int
+  - range : int
+  - atk_cd : float
+  - atkTimer : float
+  - speed : int
+  - cost : int
+  - faction : Faction
+  - canAfford(cost:int) : bool
+  + update(dt: float) : void
+  + attack(target: Entity) : void
+}
+
+class Projectile {
+  - speed : float
+  - damage : int
+  - targetId : int
+  + update(dt: float) : void
+}
+
+class Peasant {
+  + hp : 30
+  + atk : 6
+  + speed : 1
+  + cost : 20
+}
+
+class Archer {
+  + hp : 20
+  + atk : 9
+  + range : 6
+  + speed : 1
+  + cost : 30
+  + fireProjectile() : Projectile
+}
+
+class Knight {
+  + hp : 70
+  + atk : 12
+  + speed : 2
+  + cost : 60
+}
+
+note right of Peasant
+ Peasant: basic unit
+ • Cheap
+ • Low hp/atk
+end note
+
+note right of Archer
+ Archer: ranged unit
+ • Fires Projectiles
+ • Lower hp, ranged attacks
+end note
+
+note right of Knight
+ Knight: heavy unit
+ • High hp & atk
+ • Higher speed
+ • Expensive
+end note
+
+class Base {
+  - faction : Faction
+  + hp : 200
+}
+
+class Economy {
+  - gold : int
+  - incomeRate : float
+  - acc : float
+  + update(dt: float) : void
+  + spend(cost:int) : void
+  + getGold() : int
+}
+
+enum Faction {
+  Faction1
+  Faction2
+  Faction3
+  Faction4
+  Enemy
+}
+
+class FactionModifiers {
+  + name : string
+  + hpMult : float
+  + atkMult : float
+  + costMult : float
+  + peasantUpgraded : bool
+  + archerUpgraded : bool
+  + knightUpgraded : bool
+  + econBuildings : int
+  + applyUpgrades(unit:Unit) : void
+}
+
+class AIController {
+  + decideSpawn(gold:int, enemyUnits: vector<Unit*>) : Unit*
+}
+
+class Renderer {
+  + render(g: Game) : string
+}
+
+class MenuController {
+  + showStart() : void
+  + showFactionSelect() : void
+  + showMainGame() : void
+  + showBuild() : void
+  + showGameOver(result:string) : void
+  + setGameState(state: GameState) : void
+  + applyUpgrade (type: string, faction: Faction) :void
+}
+
+class Game {
+  - state : GameState
+  - playerFaction : Faction
+  - enemyFaction : Faction
+  - entities : vector<Entity*>
+  - playerBase : Base
+  - enemyBase : Base
+  - econ : Economy
+  - ai : AIController
+  - renderer : Renderer
+  - menus : MenuController
+  - gameOver : bool
+  + run() : void
+  + update(dt: float) : void
+  + handleInput(key: char) : void
+  + setState(s: GameState) : void
+}
+
+' Inheritance
+Entity <|-- Unit : "is"
+Entity <|-- Projectile : "is"
+Entity <|-- Base : "is"
+Faction <-- Base
+Faction <-- Unit
+FactionModifiers <-- Faction : "has"
+Unit <|-- Peasant : "is"
+Unit <|-- Archer : "is"
+Unit <|-- Knight : "is"
+
+' Aggregations / Associations
+Game o-- Base
+Game o-- Economy
+Game o-- AIController
+Game o-- Renderer
+Game --> MenuController
+Game --> GameState
+Game --> FactionModifiers
+Game --> Faction
+Archer --> Projectile : "creates"
+AIController ..> Unit
+MenuController --> GameState : "sets"
+MenuController --> FactionModifiers : "applies upgrade"
+Renderer ..> Game
+@enduml
