@@ -1,0 +1,99 @@
+#ifndef GAME_H
+#define GAME_H
+
+#include <vector>
+#include <string>
+#include <random>
+
+using namespace std;
+
+enum class Faction { Player, Enemy }; // Other factions to be added later. Ideally there would be 4 factions, player would choose one and the enemy will be one of the other three
+enum class UnitType { Peasant }; // Basic unit created for testing and prototype
+enum class GameState { MainGameScreen, GameOver }; // StartMenu, FactionSelect, and BuildMenu(/UpgradeMenu) to be added later
+
+// Another header file with this class to be created. This is just for testing
+// struct Unit {
+//     UnitType type{UnitType::Peasant};
+//     Faction side{Faction::Player};
+//     int hp{30}; // Should be empty or a low value in real class
+//     int atk{6}; // Should be empty or a low value in real class
+//     float pos{0.f}; // Unit position as a float
+//     float speed{35.f}; // How fast it moves
+//     float range{1.f}; // Range in length of the lane
+//     float atk_cd{0.6f}; // Attack cooldown. So units don't attack super fast
+//     float atk_timer{0.f}; // See above
+//     bool alive() const { return hp > 0; }
+// };
+
+// Another header file with this class to be created. This is just for testing
+struct Base {
+    int hp{200};
+};
+
+// Another header file with this class to be created. This is just for testing
+struct Economy {
+    int gold{100};
+    float income_per_sec{5.f};
+    float acc{0.f}; // accumulator for fractional income
+};
+
+struct Config {
+    int laneCols = 120; // How many "."s appear
+    float laneLen = 1000.f; // I had this idea of making it 10000 for precision or something, and now I had no idea why I thought that.
+    float dt = 0.25f; // Time per in-game tick. Would need to be replaced eventually
+};
+
+class Game {
+public:
+    Game();
+
+    // Advances game by one tick
+    void update();
+
+    // Resets the game
+    void reset();
+
+    // Player actions
+    bool trySpawn(UnitType t);
+
+    // Moved to private for encapsulation
+    // GameState state = GameState::MainGameScreen;
+
+    // Purely for testing
+    void damageBase(Faction side, int dmg);
+
+    // GameState
+    GameState getState() const { return state; }
+    void setState(GameState m) { state = m; }
+    bool isGameOver() const { return state == GameState::GameOver ; }
+
+    // Getters
+    // const vector<Unit>& getUnits() const { return units; }
+    const Base& getPlayerBase() const { return playerBase; }
+    const Base& getEnemyBase() const { return enemyBase; }
+    const Economy& getEconomy() const { return econ; }
+    const Config& getConfig() const { return cfg; }
+    string winnerText() const;
+
+// Split purely for organisational purposes
+private:
+    // Internal functions
+    GameState state = GameState::MainGameScreen;
+    void aiStep_();
+    void movementStep_();
+    void combatStep_();
+    void cleanupDead_();
+    float colToWorld_(int col) const;
+    int worldToCol_(float x) const;
+    void incomeStep_();
+
+    // Game properties
+    Config cfg{};
+    Economy econ{};
+    Base playerBase{}, enemyBase{};
+    // vector<Unit> units;
+    // bool gameOver{false};
+    // float aiSpawnCooldown{0.f}; // Tracking for when the enemy creates units so it doesn't just fart out units
+};
+
+#endif
