@@ -9,10 +9,6 @@
 using namespace std;
 
 namespace renderer {
-    // ANSI should clear the screen. Might not work. system("clear") can be used instead. Would need <cstdlib>
-    // void clearScreen() {
-    //     cout << "\x1b[2J\x1b[H" << flush;
-    // }
     void clearScreen() {
         system("clear");
     }
@@ -37,6 +33,13 @@ namespace renderer {
         return string(filled, '|') + string(width - filled, ' ');
     }
 
+    // Idea for realigning output
+    // static string centreText(const string& text, int width) {
+    //     if ((int)text.size() >= width) return text;
+    //     int leftPadding = (width - text.size()) / 2;
+    //     return string(leftPadding, ' ') + text;
+    // }
+
     string render(const Game& g) {
         const auto& cfg = g.getConfig();
         const auto& pb = g.getPlayerBase();
@@ -45,17 +48,16 @@ namespace renderer {
 
         // Constructs the lane that units move across
         string lane(cfg.laneCols, '.');
+        string laneBlank(cfg.laneCols, ' ');
 
         ostringstream out;
         // Gold amount and base health display
-        out << "Gold: " << econ.gold << " | Player Base[" << pb.getHp() << "] | " << " Enemy Base[" << eb.getHp() << "]\n";
-        out << "Player [" << bar(pb.getHp(), 200, 20) << "]   " << "Enemy [" << bar(eb.getHp(), 200, 20) << "]\n";
-
-        // Prints the lane
-        out << "🏰" << lane << "🏰" << "\n";
+        out << "Player [" << bar(pb.getHp(), 200, 20) << "]" << "🏰" << lane << "🏰" << "[" << bar(eb.getHp(), 200, 20) << "] Enemy\n";
+        out << "Health remaining:   " << pb.getHp() << laneBlank << "Health remaining:   " << eb.getHp() << "\n";
+        out << "Gold count:         " << econ.gold << "\n\n";
 
         // Comtrols, prompting for expected player inputs. More dynamic input with cooldowns later on
-        out << "Controls:" << "\n" << "'p' to damage enemy, 'e' to damage player, 'n' to advance tick, and 'q' to quit.\n";
+        out << "Controls:" << "\n" << "'p' to damage enemy" << "\n" << "'e' to damage player" << "\n" << "'n' to advance tick" << "\n" << "'q' to quit.\n";
 
         // Game over banner. To be replaced by gameState
         if (g.isGameOver()) {
