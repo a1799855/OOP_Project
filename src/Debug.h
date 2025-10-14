@@ -24,7 +24,7 @@ public:
     static void shutdown();
     
     // An idea on how to log what the players see. All player facing outputs would have to route through here with "s" being what the user sees
-    // static void print(const string& s);
+    static void print(const string& s);
 
     // Log to log file with specified severity
     static void log(LogLevel lvl, const string& msg);

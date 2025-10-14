@@ -76,9 +76,9 @@ string Debug::levelToStr(LogLevel lvl) {
 }
 
 // Logging player facing outputs
-// void Debug::print(const string& s) {
-//     cout << s;
-// }
+void Debug::print(const string& s) {
+    cout << s;
+}
 
 //Brings it all together. Main logging function
 void Debug::log(LogLevel lvl, const string& msg) {
