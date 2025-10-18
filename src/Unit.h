@@ -18,7 +18,8 @@ class Unit : public Entity {
         // Faction* faction;    // Will require addition of 'faction'
     public:
         Unit(int id, int hp, float pos, int atk, int range, float atk_cd, float atkTimer, int speed, int cost);
-    
+        // Add Destructor!
+
         int getAttack() const;            // Get 'atk' value
         int getRange() const;             // Get 'range' value
         float getAttackCooldown() const;  // Get 'atk_cd' value
