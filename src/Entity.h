@@ -6,8 +6,7 @@ class Entity {
     int id;
     int hp;
     float pos;
-     bool alive;
-
+    bool alive;
 
  public:
     Entity(int id, int hp, float pos); 
