@@ -42,7 +42,7 @@ void Unit::update(float dt){
     if (pos != 0.0f || pos != 1000.0f){
         // If unit is not currently at a base, update to next location
         pos = pos + ( 0.1f * getSpeed() );
-        // **Add 'setPos() to entity' to update position of units
+        setPos(pos);
     } else if (pos == 0.0f || pos == 1000.0f) {
         // **Damage base & do NOT update position
     } else {

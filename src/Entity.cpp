@@ -15,7 +15,6 @@ void Entity::takeDamage(int dmg) {
   }
 }
 
-
 int Entity::getHp() const { return hp; }
 float Entity::getPos() const { return pos; }
 void Entity::setPos(float p){pos = p;}
