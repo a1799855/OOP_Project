@@ -14,10 +14,12 @@ class Entity {
     virtual ~Entity() = default;
 
     virtual void update(float dt);     
-    virtual void takeDamage(int dmg);  
+    virtual void takeDamage(int dmg);
+    virtual void movement(float pos);  
 
     int getHp() const;
-     float getPos() const;
+    float getPos() const;
+    void setPos(float p);
     bool isAlive() const;
 };
 
