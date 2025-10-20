@@ -3,9 +3,7 @@
 
 #include "Unit.h"
 
-using namespace std;
-
-class Peasant : private Unit {
+class Peasant : public Unit {
     public:
         Peasant(int id, float pos);
         

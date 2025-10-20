@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include "Entity.h"
 #include "Unit.h"
 // #include "Economy.h"
@@ -21,12 +22,16 @@ bool Unit::canAfford(int cost){
     return true;
 }
 
+// **Will need to build a target tracking system before using the following
 void Unit::attack(Entity* target){
-    if (target->getPos() < getRange()){
-        // Basic procedure: enemy target is damaged by amount == atk value
-        target->takeDamage( getAttack() );
+    // If cooldown is over, attack
+    if (atkTimer <= 0.0f){    
+        if (fabs(target->getPos() - getPos()) <= getRange()){
+            // Basic procedure: enemy target is damaged by amount == atk value
+            target->takeDamage( getAttack() );
+            atkTimer = atk_cd;  // Reset attack cooldown timer
+        }
     }
-    // Include cooldown
 }
 
 void Unit::update(float dt){
@@ -39,16 +44,19 @@ void Unit::update(float dt){
     // IF NOT FIGHTING:
     float pos = getPos();       // Get current position of unit
     
-    if (pos != 0.0f || pos != 1000.0f){
+    if (pos >= 0.0f && pos <= 1000.0f){
         // If unit is not currently at a base, update to next location
         pos = pos + ( 0.1f * getSpeed() );
         setPos(pos);
-    } else if (pos == 0.0f || pos == 1000.0f) {
+    } else if (pos <= 0.0f || pos >= 1000.0f) {
         // **Damage base & do NOT update position
     } else {
         // **Temporary basic debug
         cout << "Class UNIT: Unit gone beyond boundary" << endl;
     }
+
+    // Reduce attack cooldown timer
+    atkTimer = atkTimer - 0.1f;     // Make dependent on dt
 }
 
 
