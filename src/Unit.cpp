@@ -66,3 +66,6 @@ float Unit::getAttackCooldown() const {return atk_cd;}
 float Unit::getAttackTimer() const {return atkTimer;}
 int Unit::getSpeed() const {return speed;}
 int Unit::getCost() const {return cost;}
+void Unit::setAttack(int newAtk) {atk = newAtk;}
+void Unit::setCost(int newCost) {cost = newCost;}
+void Unit::setHp(int newHP) {hp = newHP;}
