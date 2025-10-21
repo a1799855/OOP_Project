@@ -16,6 +16,7 @@ void Entity::takeDamage(int dmg) {
 }
 
 int Entity::getHp() const { return hp; }
+int Entity::getID() const { return id; }
 float Entity::getPos() const { return pos; }
 void Entity::setPos(float p){pos = p;}
 bool Entity::isAlive() const { return alive; }

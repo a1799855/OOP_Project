@@ -5,7 +5,7 @@ class Entity {
  protected:
     int id;
     int hp;
-    float pos;
+    float pos;    // MUST be protected for Projectile::update() to run
     bool alive;
 
  public:
@@ -17,6 +17,7 @@ class Entity {
     virtual void movement(float pos);  
 
     int getHp() const;
+    int getID() const;
     float getPos() const;
     void setPos(float p);
     bool isAlive() const;
