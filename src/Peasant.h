@@ -6,9 +6,6 @@
 class Peasant : public Unit {
     public:
         Peasant(int id, float pos);
-        
-        void attack(Entity* target) override;
-        void update(float dt) override;
 };
 
 #endif
