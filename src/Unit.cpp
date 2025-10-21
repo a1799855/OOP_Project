@@ -68,4 +68,5 @@ int Unit::getSpeed() const {return speed;}
 int Unit::getCost() const {return cost;}
 void Unit::setAttack(int newAtk) {atk = newAtk;}
 void Unit::setCost(int newCost) {cost = newCost;}
+void Unit::setAttackTimer(float newTime){atkTimer = newTime;}
 void Unit::setHp(int newHP) {hp = newHP;}

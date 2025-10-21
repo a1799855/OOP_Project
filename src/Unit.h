@@ -25,11 +25,12 @@ class Unit : public Entity {
         float getAttackCooldown() const;  // Get 'atk_cd' value
         float getAttackTimer() const;     // Get 'atkTimer' value
         int getSpeed() const;             // Get 'speed' value
-        int getCost() const;              // Get 'cost' value\
+        int getCost() const;              // Get 'cost' value
 
         void setHp(int newHP);
         void setAttack(int newAtk);
         void setCost(int newCost);
+        void setAttackTimer(float newTime);
     
         bool canAfford(int cost);
         virtual void attack(Entity* target);
