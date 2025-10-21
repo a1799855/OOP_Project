@@ -14,13 +14,14 @@ Game::Game() : playerBase(0, 0.f), enemyBase(1, cfg.laneLen) {
 // void Game::reset() {
 // }
 
-void Game::incomeStep_() {
-    econ.acc += econ.income_per_sec * cfg.dt;
-    while (econ.acc >= 1.f) {
-        econ.gold += 1;
-        econ.acc -= 1.f;
-    }
-}
+// Removed, as economy has now been properly implemented.
+//void Game::incomeStep_() {
+//    econ.acc += econ.income_per_sec * cfg.dt;
+//    while (econ.acc >= 1.f) {
+//        econ.gold += 1;
+//        econ.acc -= 1.f;
+//    }
+//}
 
 // Purely for testing
 void Game::updateProjectiles_(float dt) {
@@ -33,7 +34,8 @@ void Game::updateProjectiles_(float dt) {
 }
 
 void Game::update() {
-    incomeStep_();
+    //incomeStep_();
+    econ.update(cfg.dt);    // ** Replace when dt is properly implemented
     updateProjectiles_(cfg.dt);
     if (!playerBase.isAlive() || !enemyBase.isAlive()) {
         state = GameState::GameOver;

@@ -6,6 +6,7 @@
 #include <random>
 #include "Base.h"
 #include "Projectile.h"
+#include "Economy.h"
 
 using namespace std;
 
@@ -14,11 +15,11 @@ enum class UnitType { Peasant }; // Basic unit created for testing and prototype
 enum class GameState { MainGameScreen, GameOver }; // StartMenu, FactionSelect, and BuildMenu(/UpgradeMenu) to be added later
 
 // Another header file with this class to be created. This is just for testing
-struct Economy {
-    int gold{100};
-    float income_per_sec{5.f};
-    float acc{0.f}; // Accumulator for fractional income
-};
+//struct Economy {
+//    int gold{100};
+//    float income_per_sec{5.f};
+//    float acc{0.f}; // Accumulator for fractional income
+//};
 
 struct Config {
     int laneCols = 120; // How many "."s appear
@@ -43,9 +44,10 @@ public:
 
     // Getters
     // const vector<Unit>& getUnits() const { return units; }
+    // E.g. to see gold count, need game.getEconomy().getGold()
     const Base& getPlayerBase() const { return playerBase; }
     const Base& getEnemyBase() const { return enemyBase; }
-    const Economy& getEconomy() const { return econ; }
+    const Economy& getEconomy() const { return econ; }      // Allows to see economy
     const Config& getConfig() const { return cfg; }
     string winnerText() const;
 

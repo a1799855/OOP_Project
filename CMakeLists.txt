@@ -12,6 +12,8 @@ add_executable( oop_project
 	src/Debug.cpp
 	src/Entity.h
 	src/Entity.cpp
+	src/Economy.h
+	src/Economy.cpp
 	src/Game.h
 	src/Game.cpp
 	src/Main.cpp

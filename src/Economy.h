@@ -1,9 +1,7 @@
 #ifndef ECONOMY_H
 #define ECONOMY_H
 
-#include "Game.h"
-
-class Economy : public Game {
+class Economy {
     private:
         int gold;           // Current amount of gold for each faction
         float incomeRate;   // Rate of gold increase per timestep
