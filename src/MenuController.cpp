@@ -1,0 +1,83 @@
+#include <algorithm>
+#include <cctype>
+#include <cstdlib>
+#include <sstream>
+#include <random>
+#include "MenuController.h"
+#include "Renderer.h"
+#include "Debug.h"
+
+using namespace std;
+
+inline char firstLower(const string& s) {
+    return s.empty() ? '\0' : static_cast<char>(tolower(static_cast<unsigned char>(s[0])));
+}
+
+static constexpr FactionType factionList[4] {
+    FactionType::Faction1, // Westerland
+    FactionType::Faction2, // Easton
+    FactionType::Faction3, // Southos
+    FactionType::Faction4 // Northia
+};
+
+FactionType MenuController::factionPick_(const std::string& in) {
+    if (in.empty()) return FactionType::Faction1; // Defaults to Westerland
+    int k = std::clamp(std::atoi(in.c_str()), 1, 4);
+    return factionList[k - 1];
+}
+
+void MenuController::handle(Game& g, const string& input) {
+    switch (g.getState()) {
+        case GameState::StartMenu: onStartMenu_(g, input); break;
+        case GameState::FactionSelect: onFactionSelect_(g, input); break;
+        case GameState::MainGameScreen: onMainGameScreen_(g, input); break;
+        // case GameState::UpgradeMenu: onUpgradeMenu_(g, input); break;
+        case GameState::GameOver: onGameOver_(g, input); break;
+    }
+}
+
+void MenuController::onStartMenu_(Game& g, const string& in) {
+    char cmd = firstLower(in);
+    if (cmd == 'g' || cmd == 'G') g.setState(GameState::FactionSelect);
+    else if (cmd == 'q' || cmd == 'Q') exit(0);
+}
+
+void MenuController::onFactionSelect_(Game& g, const string& in) {
+    FactionType playerPick = factionPick_(in);
+    g.selectPlayerFaction(playerPick);
+    g.setState(GameState::MainGameScreen);
+}
+
+void MenuController::onMainGameScreen_(Game& g, const string& in){
+    if (in.empty()) { g.update(); return; }
+    char cmd = firstLower(in);
+    if (cmd == 'p' || cmd == 'P') {
+        const_cast<Base&>(g.getEnemyBase()).takeDamage(25);
+        Debug::info("Enemy damaged for 25");
+        g.update();
+    }
+    else if (cmd == 'e' || cmd == 'E') {
+        const_cast<Base&>(g.getPlayerBase()).takeDamage(25);
+        Debug::info("Player damaged for 25");
+        g.update();
+    }
+    else if (cmd == 'n') {}
+    // else if (cmd == 'm') { g.setState(GameState::UpgradeMenu); return; }
+    else if (cmd == 'q' || cmd == 'Q') {
+        Debug::info("Player quit the program");
+        exit(0);
+    }
+
+    g.update();
+    if (g.isGameOver()) g.setState(GameState::GameOver);
+}
+
+void MenuController::onGameOver_(Game& g, const string& in){
+    char cmd= firstLower(in);
+    if (cmd == 's' || cmd == 'S'){
+        g = Game();
+        g.setState(GameState::StartMenu);
+    } else if (cmd == 'q' || cmd == 'Q'){
+        exit(0);
+    }
+}
