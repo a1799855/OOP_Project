@@ -4,11 +4,18 @@
 
 using namespace std;
 
-Game::Game() : playerBase(0, 0.f), enemyBase(1, cfg.laneLen) {
+Game::Game() : 
+    playerBase(0, 0.0f), enemyBase(1, cfg.laneLen),
+    //playerFaction(FactionType::Faction1),
+    //enemyFaction(FactionType::Faction2),
+    //playerBase(0, 0.0f, Faction(Faction1)),         // ID == 0
+    //enemyBase(1, cfg.laneLen, Faction(Faction2)),   // ID == 1
+    playerEcon(),
+    enemyEcon()
+{
     // Initial game state & data
     state = GameState::MainGameScreen;
     cfg = Config{};
-    econ = Economy{};
 }
 
 // void Game::reset() {
@@ -35,7 +42,8 @@ void Game::updateProjectiles_(float dt) {
 
 void Game::update() {
     //incomeStep_();
-    econ.update(cfg.dt);    // ** Replace when dt is properly implemented
+    playerEcon.update(cfg.dt);    // ** Replace when dt is properly implemented
+    enemyEcon.update(cfg.dt);
     updateProjectiles_(cfg.dt);
     if (!playerBase.isAlive() || !enemyBase.isAlive()) {
         state = GameState::GameOver;

@@ -14,8 +14,8 @@ class Economy {
         void spend(int cost);           // Decreases gold by cost
 
         void setIncomeRate(float inc);  // Sets rate of income increase
-        int getGold();                  // Returns amount of gold present
-        float getIncomeRate();          // Returns rate of income
+        int getGold() const;            // Returns amount of gold present
+        float getIncomeRate() const;    // Returns rate of income
 };
 
 #endif

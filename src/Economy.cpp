@@ -19,5 +19,5 @@ void Economy::update(float dt){
 }
 
 void Economy::setIncomeRate(float inc){incomeRate = inc;}
-int Economy::getGold(){return gold;}
-float Economy::getIncomeRate(){return incomeRate;}
+int Economy::getGold() const {return gold;}
+float Economy::getIncomeRate() const {return incomeRate;}

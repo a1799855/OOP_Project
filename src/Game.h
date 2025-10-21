@@ -10,16 +10,9 @@
 
 using namespace std;
 
-enum class Faction { Player, Enemy }; // Other factions to be added later. Ideally there would be 4 factions, player would choose one and the enemy will be one of the other three
+//enum class Faction { Player, Enemy }; // Other factions to be added later. Ideally there would be 4 factions, player would choose one and the enemy will be one of the other three
 enum class UnitType { Peasant }; // Basic unit created for testing and prototype
 enum class GameState { MainGameScreen, GameOver }; // StartMenu, FactionSelect, and BuildMenu(/UpgradeMenu) to be added later
-
-// Another header file with this class to be created. This is just for testing
-//struct Economy {
-//    int gold{100};
-//    float income_per_sec{5.f};
-//    float acc{0.f}; // Accumulator for fractional income
-//};
 
 struct Config {
     int laneCols = 120; // How many "."s appear
@@ -47,7 +40,10 @@ public:
     // E.g. to see gold count, need game.getEconomy().getGold()
     const Base& getPlayerBase() const { return playerBase; }
     const Base& getEnemyBase() const { return enemyBase; }
-    const Economy& getEconomy() const { return econ; }      // Allows to see economy
+    const Economy& getPlayerEconomy() const { return playerEcon; } // Allows to see economy
+    const Economy& getEnemyEconomy() const { return enemyEcon; }
+    //const Faction& getPlayerFaction() const { return playerFaction; }
+    //const Faction& getEnemyFaction() const { return enemyFaction; }
     const Config& getConfig() const { return cfg; }
     string winnerText() const;
 
@@ -61,13 +57,16 @@ private:
     // void cleanupDead_();
     float colToWorld_(int col) const;
     int worldToCol_(float x) const;
-    void incomeStep_();
+    //void incomeStep_();  \\ Replaced by economy class
     void updateProjectiles_(float dt);
     vector<Projectile> projectiles;
 
     // Game properties
     Config cfg{};
-    Economy econ{};
+    //Faction playerFaction;
+    //Faction enemyFaction;
+    Economy playerEcon;
+    Economy enemyEcon;
     Base playerBase;
     Base enemyBase;
     // vector<Unit> units;

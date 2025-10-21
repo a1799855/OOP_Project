@@ -2,14 +2,14 @@
 #define BASE_H
 
 #include "Entity.h"
-#include "Faction.h"
+//#include "Faction.h"
 
 class Base : public Entity {
- public:
-  Base(int id, float pos, Faction faction);
+    public:
+        //Base(int id, float pos, Faction faction);
+        Base(int id, float pos);
 
-      void
-      update(float dt) override;
+        void update(float dt) override;
 };
 
 #endif

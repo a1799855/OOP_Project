@@ -44,7 +44,8 @@ namespace renderer {
         const auto& cfg = g.getConfig();
         const auto& pb = g.getPlayerBase();
         const auto& eb = g.getEnemyBase();
-        const auto& econ = g.getEconomy();
+        const auto& playerEcon = g.getPlayerEconomy();
+        const auto& enemyEcon = g.getEnemyEconomy();
 
         // Constructs the lane that units move across
         string lane(cfg.laneCols, '.');
@@ -54,7 +55,7 @@ namespace renderer {
         // Gold amount and base health display
         out << "Player [" << bar(pb.getHp(), 200, 20) << "]" << "🏰" << lane << "🏰" << "[" << bar(eb.getHp(), 200, 20) << "] Enemy\n";
         out << "Health remaining:   " << pb.getHp() << laneBlank << "Health remaining:   " << eb.getHp() << "\n";
-        out << "Gold count:         " << econ.gold << "\n\n";
+        out << "Gold count:         " << playerEcon.getGold() << "\n\n";
 
         // Comtrols, prompting for expected player inputs. More dynamic input with cooldowns later on
         out << "Controls:" << "\n" << "'p' to damage enemy" << "\n" << "'e' to damage player" << "\n" << "'n' to advance tick" << "\n" << "'q' to quit.\n";

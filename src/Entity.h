@@ -14,7 +14,7 @@ class Entity {
 
     virtual void update(float dt);     
     virtual void takeDamage(int dmg);
-    virtual void movement(float pos);  
+    //virtual void movement(float pos);  
 
     int getHp() const;
     int getID() const;
