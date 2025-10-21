@@ -12,17 +12,25 @@ add_executable( oop_project
 	src/Debug.cpp
 	src/Entity.h
 	src/Entity.cpp
+	src/Unit.h
+	src/Unit.cpp
+	src/Knight.h
+	src/Knight.cpp
+	src/Peasant.h
+	src/Peasant.cpp
 	src/Game.h
 	src/Game.cpp
 	src/Main.cpp
 	src/Projectile.h
 	src/Projectile.cpp
-	src/Faction.h
-	src/Faction.h
+	src/Archer.h
+	src/Archer.cpp
 	src/Economy.h
 	src/Economy.cpp
-	src/FactionModifiers.h
-	src/FactionModifiers.h
+	# src/FactionModifiers.h
+	# src/FactionModifiers.h
+	# src/Faction.h
+	# src/Faction.h
 )
 
 #Enables warnings and adds optimisation
