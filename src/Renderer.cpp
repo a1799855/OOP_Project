@@ -76,12 +76,65 @@ namespace renderer {
 
         ostringstream out;
         // Gold amount and base health display
-        out << pf << " [" << bar(pb.getHp(), 200, 20) << "]" << "🏰" << lane << "🏰" << "[" << bar(eb.getHp(), 200, 20) << "] " << ef << "\n";
+        out << "\n" << pf << " [" << bar(pb.getHp(), 200, 20) << "]" << "🏰" << lane << "🏰" << "[" << bar(eb.getHp(), 200, 20) << "] " << ef << "\n";
         out << "Health remaining:   " << pb.getHp() << laneBlank << "Health remaining:   " << eb.getHp() << "\n";
         out << "Gold count:         " << pe.getGold() << laneBlank << "Gold Count:         " << ee.getGold() << "\n\n";
 
         // Comtrols, prompting for expected player inputs. More dynamic input with cooldowns later on
-        out << "Controls:" << "\n" << "'p' to damage enemy" << "\n" << "'e' to damage player" << "\n" << "'n' to advance tick" << "\n" << "'q' to quit.\n";
+        out << "Peasant (20) Gold  [p]\n"
+            << "Archer  (30) Gold  [a]\n"
+            << "Knight  (60) Gold  [k]\n"
+            << "Upgrade menu       [m]\n"
+            << "Quit               [q]\n";
+
+        // Game over banner. To be replaced by gameState
+        if (g.isGameOver()) {
+            out << "\n=== " << g.winnerText() << " ===\n";
+        }
+
+        // Debug handling; "return s;" should be what the player sees
+        const string s = out.str();
+        Debug::print(s);
+        return s;
+    }
+
+    string renderUpgradeMenu(const Game& g) {
+        const auto& cfg = g.getConfig();
+        const auto& pb = g.getPlayerBase();
+        const auto& eb = g.getEnemyBase();
+        const auto& pe = g.getPlayerEconomy();
+        const auto& ee = g.getEnemyEconomy();
+        const string pf = Faction(g.playerFaction).getFactionName();
+        const auto& ef = Faction(g.enemyFaction).getFactionName();
+
+        // Constructs the lane that units move across
+        string lane(cfg.laneCols, '.');
+        string laneBlank(cfg.laneCols, ' ');
+
+        // Iterate over entities, finding position
+        for (int i = 0; i < static_cast<int>(g.getPlayerEntities().size()); i++){
+            Entity* ent = g.getPlayerEntities()[i];
+            int column_pos =  static_cast<int>(( ent->getPos() / cfg.laneLen ) * cfg.laneCols);
+            lane[column_pos] = ent->getPlayerSymb();
+        }
+        for (int i = 0; i < static_cast<int>(g.getEnemyEntities().size()); i++){
+            Entity* ent = g.getEnemyEntities()[i];
+            int column_pos =  static_cast<int>(( ent->getPos() / cfg.laneLen ) * cfg.laneCols);
+            lane[column_pos] = ent->getEnemySymb();
+        }
+
+        ostringstream out;
+        // Gold amount and base health display
+        out << "\n" << pf << " [" << bar(pb.getHp(), 200, 20) << "]" << "🏰" << lane << "🏰" << "[" << bar(eb.getHp(), 200, 20) << "] " << ef << "\n";
+        out << "Health remaining:   " << pb.getHp() << laneBlank << "Health remaining:   " << eb.getHp() << "\n";
+        out << "Gold count:         " << pe.getGold() << laneBlank << "Gold Count:         " << ee.getGold() << "\n\n";
+
+        // Comtrols, prompting for expected player inputs. More dynamic input with cooldowns later on
+        out << "Peasant (20) Gold  [p]\n"
+            << "Archer  (30) Gold  [a]\n"
+            << "Knight  (60) Gold  [k]\n"
+            // << "Upgrade menu       [m]\n"
+            << "Quit               [q]\n";
 
         // Game over banner. To be replaced by gameState
         if (g.isGameOver()) {

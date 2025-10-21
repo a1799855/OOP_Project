@@ -21,7 +21,7 @@ namespace renderer {
     string renderStartMenu(const Game& g);
     string renderFactionSelect(const Game& g);
     string renderMainGameScreen(const Game& g);
-    // string renderUpgradeMenu(const Game& g);
+    string renderUpgradeMenu(const Game& g);
     string renderGameOver(const Game& g);
 }
 

@@ -51,25 +51,67 @@ void MenuController::onFactionSelect_(Game& g, const string& in) {
 void MenuController::onMainGameScreen_(Game& g, const string& in){
     if (in.empty()) { g.update(); return; }
     char cmd = firstLower(in);
-    if (cmd == 'p' || cmd == 'P') {
+    if (cmd == '1') {
         const_cast<Base&>(g.getEnemyBase()).takeDamage(25);
         Debug::info("Enemy damaged for 25");
         g.update();
     }
-    else if (cmd == 'e' || cmd == 'E') {
+    else if (cmd == '2') {
         const_cast<Base&>(g.getPlayerBase()).takeDamage(25);
         Debug::info("Player damaged for 25");
         g.update();
     }
+    else if (cmd == 'p' || cmd == 'P') {
+        g.playerSpawn(UnitType::Peasant);
+        Debug::info("Spawned peasant");
+        g.update();
+    }
+    else if (cmd == 'a' || cmd == 'A') {
+        g.playerSpawn(UnitType::Archer);
+        Debug::info("Spawned archer");
+        g.update();
+    }
+    else if (cmd == 'k' || cmd == 'K') {
+        g.playerSpawn(UnitType::Knight);
+        Debug::info("Spawned knight");
+        g.update();
+        Debug::info(to_string(g.usePlayerEconomy().getGold()));
+    }
     else if (cmd == 'n') {}
-    // else if (cmd == 'm') { g.setState(GameState::UpgradeMenu); return; }
+    else if (cmd == 'm') {
+        g.setState(GameState::UpgradeMenu); return;
+    }
     else if (cmd == 'q' || cmd == 'Q') {
         Debug::info("Player quit the program");
         exit(0);
     }
-
-    g.update();
+    g.AIController();
+    // g.update();
     if (g.isGameOver()) g.setState(GameState::GameOver);
+}
+
+void MenuController::onUpgradeMenu_(Game& g, const string& in){
+    if (in.empty()) { return; }
+    char cmd = firstLower(in);
+    if (cmd == 'p' || cmd == 'P') {
+        g.Spawn(UnitType::Peasant, g.usePlayerEconomy());
+        Debug::info("Spawned peasant");
+        g.update();
+    }
+    else if (cmd == 'a' || cmd == 'A') {
+        g.Spawn(UnitType::Archer, g.usePlayerEconomy());
+        Debug::info("Spawned archer");
+        g.update();
+    }
+    else if (cmd == 'k' || cmd == 'K') {
+        g.Spawn(UnitType::Knight, g.usePlayerEconomy());
+        Debug::info("Spawned knight");
+        g.update();
+        Debug::info(to_string(g.usePlayerEconomy().getGold()));
+    }
+    else if (cmd == 'm' || cmd == 'M') {
+        g.setState(GameState::MainGameScreen);
+    }
 }
 
 void MenuController::onGameOver_(Game& g, const string& in){

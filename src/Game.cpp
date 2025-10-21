@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <cstdlib>
+#include <array>
 #include "Game.h"
 #include "Debug.h"
 #include "Unit.h"
@@ -8,6 +8,27 @@
 #include "Archer.h"
 
 using namespace std;
+
+// Manually selecting factions for both. Added for debugging/stretch goals
+void Game::setFactions(FactionType playerPick, FactionType enemyPick) {
+    playerFaction = playerPick;
+    enemyFaction = enemyPick;
+}
+
+void Game::selectPlayerFaction(FactionType playerPick) {
+    playerFaction = playerPick;
+
+    array<FactionType, 4> allFactions{
+        FactionType::Faction1, FactionType::Faction2,
+        FactionType::Faction3, FactionType::Faction4
+    };
+
+    FactionType pool[3];
+    int enemyPool = 0;
+    for (auto randomEnemy : allFactions) if (randomEnemy != playerPick) pool[enemyPool++] = randomEnemy;
+    uniform_int_distribution<int> dist(0, 2);
+    enemyFaction = pool[dist(rng)];
+}
 
 Game::Game() : 
     playerBase(0, 0.0f), enemyBase(1, cfg.laneLen),
@@ -38,12 +59,12 @@ void Game::update() {
     playerEcon.update(cfg.dt);    // ** Replace when dt is properly implemented
     enemyEcon.update(cfg.dt);
     updateProjectiles_(cfg.dt);
+    if (!playerBase.isAlive() || !enemyBase.isAlive()) {
+        state = GameState::GameOver;
+    }
     for (int i = 0; i < static_cast<int>(playerEntities.size()); i++){
         Entity* ent = playerEntities[i];
         ent->update(cfg.dt);
-    }
-    if (!playerBase.isAlive() || !enemyBase.isAlive()) {
-        state = GameState::GameOver;
     }
 }
 
@@ -51,7 +72,7 @@ void Game::update() {
 void Game::playerSpawn(UnitType uType){
     if (uType == UnitType::Knight){
         int K_price = Knight(0,0.0f).getCost();
-        if (playerEcon.getGold() >= K_price){
+         if (playerEcon.getGold() >= K_price){
             playerEntities.push_back(new Knight(uniqueID,0.0f));   // Temporary ID
             playerEcon.spend(K_price);
             uniqueID = uniqueID + 1;
@@ -114,13 +135,9 @@ void Game::AIController(){
 }
 
 string Game::winnerText() const {
-    // Idea for later
-    // const bool playerAlive = playerBase.isAlive();
-    // const bool enemyAlive = enemyBase.isAlive();
-
     if (!playerBase.isAlive() && !enemyBase.isAlive()) return "Draw!";
-    if (!enemyBase.isAlive()) return "You won!";
-    if (!playerBase.isAlive()) return "You lost!";
+    if (!enemyBase.isAlive()) return "YOU WIN!";
+    if (!playerBase.isAlive()) return "YOU LOSE!";
     return "";
 }
 

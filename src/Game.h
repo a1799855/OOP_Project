@@ -6,17 +6,18 @@
 #include <random>
 #include "Base.h"
 #include "Projectile.h"
+#include "Unit.h"
+#include "Faction.h"
 #include "Economy.h"
-//#include "Faction.h"
+#include "Faction.h"
 using namespace std;
 
-//enum class Faction { Player, Enemy }; // Other factions to be added later. Ideally there would be 4 factions, player would choose one and the enemy will be one of the other three
-enum class UnitType { Peasant, Knight, Archer }; // Basic unit created for testing and prototype
-enum class GameState { MainGameScreen, GameOver }; // StartMenu, FactionSelect, and BuildMenu(/UpgradeMenu) to be added later
+enum class UnitType { Peasant, Knight, Archer };
+enum class GameState { StartMenu, FactionSelect, MainGameScreen, UpgradeMenu, GameOver };
 
 struct Config {
     int laneCols = 120; // How many "."s appear
-    float laneLen = 120.0f; // I had this idea of making it 10000 for precision or something, and now I had no idea why I thought that.
+    float laneLen = 120.0f; // 120.0 is more sensible than previous 1000.0, even the idea of replacing with an int has floated around thought that would be less scalable
     float dt = 0.25f; // Time per in-game tick. Would need to be replaced eventually. Maybe cap to 60 FPS '1.0f / 60.0f' / 0.0167s
 };
 
@@ -30,24 +31,31 @@ public:
     // Resets the game
     // void reset();
 
+    mt19937 rng{random_device{}()};
+
+    void spawnPeasant(bool isPlayer);
+
     // GameState
     GameState getState() const { return state; }
     void setState(GameState m) { state = m; }
     bool isGameOver() const { return state == GameState::GameOver ; }
+    // Default factions. Basically a safety net
+    FactionType playerFaction = FactionType::Faction1;
+    FactionType enemyFaction = FactionType::Faction2;
+    
+    void selectPlayerFaction(FactionType f);
+    void setFactions(FactionType playerPick, FactionType enemyPick);
 
     // Getters
-    // const vector<Unit>& getUnits() const { return units; }
+    // E.g. to see gold count, need game.getEconomy().getGold()
     const vector<Entity*>& getPlayerEntities() const { return playerEntities; }
     const vector<Entity*>& getEnemyEntities() const { return enemyEntities; }
-    // E.g. to see gold count, need game.getEconomy().getGold()
     const Base& getPlayerBase() const { return playerBase; }
     const Base& getEnemyBase() const { return enemyBase; }
     const Economy& getPlayerEconomy() const { return playerEcon; } // Allows to see economy
     const Economy& getEnemyEconomy() const { return enemyEcon; }
-    Economy& usePlayerEconomy() { return playerEcon; } 
-    Economy& useEnemyEconomy() { return enemyEcon; } 
-    //const Faction& getPlayerFaction() const { return playerFaction; }
-    //const Faction& getEnemyFaction() const { return enemyFaction; }
+    Economy& usePlayerEconomy() { return playerEcon; }
+    Economy& useEnemyEconomy() { return enemyEcon; }
     int getUniqueID();
     void setUniqueID(int i);
     void playerSpawn(UnitType uType);
@@ -61,13 +69,8 @@ private:
     // Internal functions
     GameState state = GameState::MainGameScreen;
     int uniqueID = 2;
-    // void aiStep_();
-    // void movementStep_();  // Currently contained in 'upgrade'
-    // void combatStep_();
-    // void cleanupDead_();
     float colToWorld_(int col) const;
     int worldToCol_(float x) const;
-    //void incomeStep_();  \\ Replaced by economy class
     vector<Entity*> playerEntities;  // **********
     vector<Entity*> enemyEntities;   // **********
     void updateProjectiles_(float dt);
@@ -75,15 +78,10 @@ private:
 
     // Game properties
     Config cfg{};
-    //Faction playerFaction;
-    //Faction enemyFaction;
     Economy playerEcon;
     Economy enemyEcon;
     Base playerBase;
     Base enemyBase;
-    // vector<Unit> units;
-    // bool gameOver{false};
-    // float aiSpawnCooldown{0.f}; // Tracking for when the enemy creates units so it doesn't just fart out units
 };
 
 #endif

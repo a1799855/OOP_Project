@@ -18,7 +18,7 @@ class MenuController {
         void onStartMenu_(Game& game, const string& in);
         void onFactionSelect_(Game& game, const string& in);
         void onMainGameScreen_(Game& game, const string& in);
-        // void onUpgradeMenu_(Game& game, const string& in);
+        void onUpgradeMenu_(Game& game, const string& in);
         void onGameOver_(Game& game, const string& in);
 
         FactionType factionPick_(const string& in); // Input for Faction, 1-4 
