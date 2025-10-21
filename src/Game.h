@@ -32,7 +32,9 @@ public:
     // void reset();
 
     mt19937 rng{random_device{}()};
-
+    Entity* closestEnemy(Entity* attacker, bool isPlayerUnit);
+    void playerCombatStep();
+    void enemyCombatStep();
     void spawnPeasant(bool isPlayer);
 
     // GameState
@@ -75,7 +77,6 @@ private:
     vector<Entity*> enemyEntities;   // **********
     void updateProjectiles_(float dt);
     vector<Projectile> projectiles;
-
     // Game properties
     Config cfg{};
     Economy playerEcon;

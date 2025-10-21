@@ -54,6 +54,84 @@ void Game::updateProjectiles_(float dt) {
         projectiles.end());
 }
 
+Entity* Game::closestEnemy(Entity* attacker, bool isPlayerUnit) {
+    if (attacker == nullptr || !attacker->isAlive()) {
+        return nullptr;
+    }
+    
+    float attackerPos = attacker->getPos();
+    Entity* closest = nullptr;
+    float minDistance = 999999.0f;
+    
+    if (isPlayerUnit) {
+        // Player unit - search enemy entities and enemy base
+        // Check enemy base first (always at end of lane)
+        float distToBase = fabs(enemyBase.getPos() - attackerPos);
+        if (enemyBase.isAlive() && distToBase < minDistance) {
+            minDistance = distToBase;
+            closest = &enemyBase;
+        }
+        
+        // Check enemy units
+        for (Entity* enemy : enemyEntities) {
+            if (enemy->isAlive()) {
+                float dist = fabs(enemy->getPos() - attackerPos);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closest = enemy;
+                }
+            }
+        }
+    } else {
+        float distToBase = fabs(playerBase.getPos() - attackerPos);
+        if (playerBase.isAlive() && distToBase < minDistance) {
+            minDistance = distToBase;
+            closest = &playerBase;
+        }
+        
+        // Check player units
+        for (Entity* player : playerEntities) {
+            if (player->isAlive()) {
+                float dist = fabs(player->getPos() - attackerPos);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closest = player;
+                }
+            }
+        }
+    }
+    
+    return closest;
+}
+
+void Game::playerCombatStep() {
+    for (Entity* ent : playerEntities) {
+        if (!ent->isAlive()) continue;
+        
+        Unit* unit = dynamic_cast<Unit*>(ent);
+        if (unit != nullptr) {
+            Entity* target = closestEnemy(unit, true);
+            if (target != nullptr) {
+                unit->attack(target);
+            }
+        }
+    }
+}
+
+void Game::enemyCombatStep() {
+    for (Entity* ent : enemyEntities) {
+        if (!ent->isAlive()) continue;
+        
+        Unit* unit = dynamic_cast<Unit*>(ent);
+        if (unit != nullptr) {
+            Entity* target = closestEnemy(unit, false);
+            if (target != nullptr) {
+                unit->attack(target);
+            }
+        }
+    }
+}
+
 void Game::update() {
     //incomeStep_();
     playerEcon.update(cfg.dt);    // ** Replace when dt is properly implemented
@@ -72,7 +150,32 @@ void Game::update() {
         Entity* ent = enemyEntities[i];
         ent->update(cfg.dt);
     }
+    enemyCombatStep(); // enemy will automatically attack each turn 
+
+    playerEntities.erase(
+        remove_if(playerEntities.begin(), playerEntities.end(),
+            [](Entity* e) { 
+                if (!e->isAlive()) {
+                    delete e; 
+                    return true; 
+                } 
+                return false; 
+            }),
+        playerEntities.end());
+
+    enemyEntities.erase(
+        remove_if(enemyEntities.begin(), enemyEntities.end(),
+        [](Entity* e) { 
+            if (!e->isAlive()) {
+                delete e; 
+                return true; 
+            } 
+            return false; 
+        }),
+        enemyEntities.end());
 }
+
+    
 
 // Checks if economy can afford, and if so spawns in unit
 void Game::playerSpawn(UnitType uType){
