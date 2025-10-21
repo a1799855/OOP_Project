@@ -205,10 +205,10 @@ void Faction::applyArcherModifiers(Unit* unit) {
 
 std::string Faction::getFactionName() const {
     switch (factionType) {
-        case Faction1: return "Knights Faction";
-        case Faction2: return "Economy Faction";
-        case Faction3: return "Ranged Faction";
-        case Faction4: return "Balanced Faction";
+        case Faction1: return "Westerland♞ "; // "Knights Faction"
+        case Faction2: return "Easton💰 "; // "Economy Faction"
+        case Faction3: return "Southos🏹 "; // "Ranged Faction"
+        case Faction4: return "Northia⚖️ "; // "Balanced Faction"
         default: return "Unknown";
     }
 }

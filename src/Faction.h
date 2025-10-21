@@ -8,10 +8,10 @@
 class Unit;
 
 enum FactionType {
-    Faction1,
-    Faction2,
-    Faction3,
-    Faction4,
+    Faction1, // Westerland
+    Faction2, // Easton
+    Faction3, // Southos
+    Faction4 // Northia
 };
 
 class Faction {
@@ -23,6 +23,7 @@ private:
 
 public:
     explicit Faction(FactionType type);
+
     ~Faction();
 
     FactionType getFactionType() const;
@@ -36,8 +37,7 @@ public:
     void applyKnightModifiers(Unit* unit);
     void applyPeasantModifiers(Unit* unit);
     void applyArcherModifiers(Unit* unit);
-
     std::string getFactionName() const;
 };
 
-#endif // FACTION_H
+#endif
