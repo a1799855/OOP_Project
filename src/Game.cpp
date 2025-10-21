@@ -62,8 +62,14 @@ void Game::update() {
     if (!playerBase.isAlive() || !enemyBase.isAlive()) {
         state = GameState::GameOver;
     }
+    // Individually update each player entity
     for (int i = 0; i < static_cast<int>(playerEntities.size()); i++){
         Entity* ent = playerEntities[i];
+        ent->update(cfg.dt);
+    }
+    // Individually update each enemy entity
+    for (int i = 0; i < static_cast<int>(enemyEntities.size()); i++){
+        Entity* ent = enemyEntities[i];
         ent->update(cfg.dt);
     }
 }
@@ -71,25 +77,25 @@ void Game::update() {
 // Checks if economy can afford, and if so spawns in unit
 void Game::playerSpawn(UnitType uType){
     if (uType == UnitType::Knight){
-        int K_price = Knight(0,0.0f).getCost();
+        int K_price = Knight(0,0.0f,2).getCost();
          if (playerEcon.getGold() >= K_price){
-            playerEntities.push_back(new Knight(uniqueID,0.0f));
+            playerEntities.push_back(new Knight(uniqueID,0.0f,2));
             playerEcon.spend(K_price);
             uniqueID = uniqueID + 1;
         }
     }
     if (uType == UnitType::Peasant){
-        int P_price = Peasant(0,0.0f).getCost();
+        int P_price = Peasant(0,0.0f,1).getCost();
         if (playerEcon.getGold() >= P_price){
-            playerEntities.push_back(new Peasant(uniqueID,0.0f)); 
+            playerEntities.push_back(new Peasant(uniqueID,0.0f,1)); 
             playerEcon.spend(P_price);
             uniqueID = uniqueID + 1;
         }
     }
     if (uType == UnitType::Archer){
-        int A_price = Archer(0,0.0f).getCost();
+        int A_price = Archer(0,0.0f,1).getCost();
         if (playerEcon.getGold() >= A_price){
-            playerEntities.push_back(new Archer(uniqueID,0.0f));
+            playerEntities.push_back(new Archer(uniqueID,0.0f,1));
             playerEcon.spend(A_price);
             uniqueID = uniqueID + 1;
         }
@@ -98,25 +104,25 @@ void Game::playerSpawn(UnitType uType){
 
 void Game::enemySpawn(UnitType uType){
     if (uType == UnitType::Knight){
-        int K_price = Knight(0,0.0f).getCost();
+        int K_price = Knight(0,0.0f,-2).getCost();
         if (enemyEcon.getGold() >= K_price){
-            enemyEntities.push_back(new Knight(uniqueID,cfg.laneLen));
+            enemyEntities.push_back(new Knight(uniqueID,cfg.laneLen-1,-2));
             enemyEcon.spend(K_price);
             uniqueID = uniqueID + 1;
         }
     }
     if (uType == UnitType::Peasant){
-        int P_price = Peasant(0,0.0f).getCost();
+        int P_price = Peasant(0,0.0f,-1).getCost();
         if (enemyEcon.getGold() >= P_price){
-            enemyEntities.push_back(new Peasant(uniqueID,cfg.laneLen));
+            enemyEntities.push_back(new Peasant(uniqueID,cfg.laneLen-1,-1));
             enemyEcon.spend(P_price);
             uniqueID = uniqueID + 1;
         }
     }
     if (uType == UnitType::Archer){
-        int A_price = Archer(0,0.0f).getCost();
+        int A_price = Archer(0,0.0f,-1).getCost();
         if (enemyEcon.getGold() >= A_price){
-            enemyEntities.push_back(new Archer(uniqueID,cfg.laneLen));
+            enemyEntities.push_back(new Archer(uniqueID,cfg.laneLen-1,-1));
             enemyEcon.spend(A_price);
             uniqueID = uniqueID + 1;
         }
