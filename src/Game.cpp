@@ -73,7 +73,7 @@ void Game::playerSpawn(UnitType uType){
     if (uType == UnitType::Knight){
         int K_price = Knight(0,0.0f).getCost();
          if (playerEcon.getGold() >= K_price){
-            playerEntities.push_back(new Knight(uniqueID,0.0f));   // Temporary ID
+            playerEntities.push_back(new Knight(uniqueID,0.0f));
             playerEcon.spend(K_price);
             uniqueID = uniqueID + 1;
         }
@@ -81,7 +81,7 @@ void Game::playerSpawn(UnitType uType){
     if (uType == UnitType::Peasant){
         int P_price = Peasant(0,0.0f).getCost();
         if (playerEcon.getGold() >= P_price){
-            playerEntities.push_back(new Peasant(uniqueID,0.0f));    // Temporary ID
+            playerEntities.push_back(new Peasant(uniqueID,0.0f)); 
             playerEcon.spend(P_price);
             uniqueID = uniqueID + 1;
         }
@@ -89,7 +89,7 @@ void Game::playerSpawn(UnitType uType){
     if (uType == UnitType::Archer){
         int A_price = Archer(0,0.0f).getCost();
         if (playerEcon.getGold() >= A_price){
-            playerEntities.push_back(new Archer(uniqueID,0.0f));    // Temporary ID
+            playerEntities.push_back(new Archer(uniqueID,0.0f));
             playerEcon.spend(A_price);
             uniqueID = uniqueID + 1;
         }
@@ -100,7 +100,7 @@ void Game::enemySpawn(UnitType uType){
     if (uType == UnitType::Knight){
         int K_price = Knight(0,0.0f).getCost();
         if (enemyEcon.getGold() >= K_price){
-            enemyEntities.push_back(new Knight(uniqueID,cfg.laneLen));   // Temporary ID
+            enemyEntities.push_back(new Knight(uniqueID,cfg.laneLen));
             enemyEcon.spend(K_price);
             uniqueID = uniqueID + 1;
         }
@@ -108,7 +108,7 @@ void Game::enemySpawn(UnitType uType){
     if (uType == UnitType::Peasant){
         int P_price = Peasant(0,0.0f).getCost();
         if (enemyEcon.getGold() >= P_price){
-            enemyEntities.push_back(new Peasant(uniqueID,cfg.laneLen));    // Temporary ID
+            enemyEntities.push_back(new Peasant(uniqueID,cfg.laneLen));
             enemyEcon.spend(P_price);
             uniqueID = uniqueID + 1;
         }
@@ -116,7 +116,7 @@ void Game::enemySpawn(UnitType uType){
     if (uType == UnitType::Archer){
         int A_price = Archer(0,0.0f).getCost();
         if (enemyEcon.getGold() >= A_price){
-            enemyEntities.push_back(new Archer(uniqueID,cfg.laneLen));    // Temporary ID
+            enemyEntities.push_back(new Archer(uniqueID,cfg.laneLen));
             enemyEcon.spend(A_price);
             uniqueID = uniqueID + 1;
         }

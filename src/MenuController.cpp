@@ -94,17 +94,17 @@ void MenuController::onUpgradeMenu_(Game& g, const string& in){
     if (in.empty()) { return; }
     char cmd = firstLower(in);
     if (cmd == 'p' || cmd == 'P') {
-        g.Spawn(UnitType::Peasant, g.usePlayerEconomy());
+        g.playerSpawn(UnitType::Peasant);
         Debug::info("Spawned peasant");
         g.update();
     }
     else if (cmd == 'a' || cmd == 'A') {
-        g.Spawn(UnitType::Archer, g.usePlayerEconomy());
+        g.playerSpawn(UnitType::Archer);
         Debug::info("Spawned archer");
         g.update();
     }
     else if (cmd == 'k' || cmd == 'K') {
-        g.Spawn(UnitType::Knight, g.usePlayerEconomy());
+        g.playerSpawn(UnitType::Knight);
         Debug::info("Spawned knight");
         g.update();
         Debug::info(to_string(g.usePlayerEconomy().getGold()));

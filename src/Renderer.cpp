@@ -73,6 +73,20 @@ namespace renderer {
         // Constructs the lane that units move across
         string lane(cfg.laneCols, '.');
         string laneBlank(cfg.laneCols, ' ');
+        
+        // Search 'playerEntity' for all positions, extract positions and render
+        for (int i = 0; i < static_cast<int>(g.getPlayerEntities().size()); i++){
+            Entity* ent = g.getPlayerEntities()[i];
+            int column_pos =  static_cast<int>(( ent->getPos() / cfg.laneLen ) * cfg.laneCols);
+            lane[column_pos] = ent->getPlayerSymb();
+        }
+
+        // Search 'enemyEntity' for all positions, extract positions and render
+        for (int i = 0; i < static_cast<int>(g.getEnemyEntities().size()); i++){
+            Entity* ent = g.getEnemyEntities()[i];
+            int column_pos =  static_cast<int>(( ent->getPos() / cfg.laneLen ) * cfg.laneCols);
+            lane[column_pos] = ent->getEnemySymb();
+        }
 
         ostringstream out;
         // Gold amount and base health display
