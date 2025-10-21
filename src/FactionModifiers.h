@@ -2,8 +2,6 @@
 #define FACTIONMODIFIERS_H
 
 #include <string>
-
-
 #include "Unit.h"
 
 class FactionModifiers {

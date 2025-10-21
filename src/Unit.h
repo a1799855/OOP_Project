@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include "Entity.h"
-#include "Faction.h"
+//#include "Faction.h"
 
 using namespace std;
 
@@ -27,14 +27,14 @@ class Unit : public Entity {
         int getSpeed() const;             // Get 'speed' value
         int getCost() const;              // Get 'cost' value
 
-        void setHp(int newHP);
+        void setHp(int newHP);            // *** Why here & not in entity?
         void setAttack(int newAtk);
         void setCost(int newCost);
         void setAttackTimer(float newTime);
     
         bool canAfford(int cost);
         virtual void attack(Entity* target);
-        virtual void update(float dt);
+        virtual void update(float dt) override;
 };
 
 #endif

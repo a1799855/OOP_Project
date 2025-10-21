@@ -39,6 +39,8 @@ void Unit::update(float dt){
         return;
     }
 
+    cout << "Used this" << endl;
+
     // IF FIGHTING: ...
 
     // IF NOT FIGHTING:
@@ -46,7 +48,7 @@ void Unit::update(float dt){
     
     if (pos >= 0.0f && pos <= 1000.0f){
         // If unit is not currently at a base, update to next location
-        pos = pos + ( 0.1f * getSpeed() );
+        pos = pos + ( 1.0f * getSpeed() );
         setPos(pos);
     } else if (pos <= 0.0f || pos >= 1000.0f) {
         // **Damage base & do NOT update position
