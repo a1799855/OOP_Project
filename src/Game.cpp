@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstdlib>
 #include "Game.h"
 #include "Debug.h"
 #include "Unit.h"
@@ -47,28 +48,69 @@ void Game::update() {
 }
 
 // Checks if economy can afford, and if so spawns in unit
-void Game::Spawn(UnitType uType, Economy& econ){
+void Game::playerSpawn(UnitType uType){
     if (uType == UnitType::Knight){
         int K_price = Knight(0,0.0f).getCost();
-        if (econ.getGold() >= K_price){
-            playerEntities.push_back(new Knight(10,0.0f));   // Temporary ID
-            econ.spend(K_price);
+        if (playerEcon.getGold() >= K_price){
+            playerEntities.push_back(new Knight(uniqueID,0.0f));   // Temporary ID
+            playerEcon.spend(K_price);
+            uniqueID = uniqueID + 1;
         }
     }
     if (uType == UnitType::Peasant){
         int P_price = Peasant(0,0.0f).getCost();
-        if (econ.getGold() >= P_price){
-            playerEntities.push_back(new Peasant(11,0.0f));    // Temporary ID
-            econ.spend(P_price);
+        if (playerEcon.getGold() >= P_price){
+            playerEntities.push_back(new Peasant(uniqueID,0.0f));    // Temporary ID
+            playerEcon.spend(P_price);
+            uniqueID = uniqueID + 1;
         }
     }
     if (uType == UnitType::Archer){
         int A_price = Archer(0,0.0f).getCost();
-        if (econ.getGold() >= A_price){
-            playerEntities.push_back(new Archer(12,0.0f));    // Temporary ID
-            econ.spend(A_price);
+        if (playerEcon.getGold() >= A_price){
+            playerEntities.push_back(new Archer(uniqueID,0.0f));    // Temporary ID
+            playerEcon.spend(A_price);
+            uniqueID = uniqueID + 1;
         }
     }
+}
+
+void Game::enemySpawn(UnitType uType){
+    if (uType == UnitType::Knight){
+        int K_price = Knight(0,0.0f).getCost();
+        if (enemyEcon.getGold() >= K_price){
+            enemyEntities.push_back(new Knight(uniqueID,cfg.laneLen));   // Temporary ID
+            enemyEcon.spend(K_price);
+            uniqueID = uniqueID + 1;
+        }
+    }
+    if (uType == UnitType::Peasant){
+        int P_price = Peasant(0,0.0f).getCost();
+        if (enemyEcon.getGold() >= P_price){
+            enemyEntities.push_back(new Peasant(uniqueID,cfg.laneLen));    // Temporary ID
+            enemyEcon.spend(P_price);
+            uniqueID = uniqueID + 1;
+        }
+    }
+    if (uType == UnitType::Archer){
+        int A_price = Archer(0,0.0f).getCost();
+        if (enemyEcon.getGold() >= A_price){
+            enemyEntities.push_back(new Archer(uniqueID,cfg.laneLen));    // Temporary ID
+            enemyEcon.spend(A_price);
+            uniqueID = uniqueID + 1;
+        }
+    }
+}
+
+void Game::AIController(){
+    int randomNum = rand() % 8;
+    if (randomNum == 0){
+        enemySpawn(UnitType::Peasant);
+    } else if (randomNum == 1 || randomNum == 2){
+        enemySpawn(UnitType::Knight);
+    } else if (randomNum == 3 || randomNum == 4 || randomNum == 5){
+        enemySpawn(UnitType::Archer);
+    } 
 }
 
 string Game::winnerText() const {
@@ -91,3 +133,6 @@ int Game::worldToCol_(float x) const {
     float t = x / cfg.laneLen;
     return clamp(int(t * (cfg.laneCols - 1)), 0, cfg.laneCols - 1);
 }
+
+int Game::getUniqueID(){ return uniqueID; }
+void Game::setUniqueID(int i){ uniqueID = i; }

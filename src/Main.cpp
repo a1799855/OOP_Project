@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <string>
 #include <cstdlib>
+#include <cstdlib>
+#include <ctime>
 #include "Game.h"
 #include "Debug.h"
 
@@ -51,12 +53,16 @@ namespace renderer {
         string lane(cfg.laneCols, '.');
         string laneBlank(cfg.laneCols, ' ');
 
-        // ***********
         // Iterate over entities, finding position
         for (int i = 0; i < static_cast<int>(g.getPlayerEntities().size()); i++){
             Entity* ent = g.getPlayerEntities()[i];
             int column_pos =  static_cast<int>(( ent->getPos() / cfg.laneLen ) * cfg.laneCols);
             lane[column_pos] = ent->getPlayerSymb();
+        }
+        for (int i = 0; i < static_cast<int>(g.getEnemyEntities().size()); i++){
+            Entity* ent = g.getEnemyEntities()[i];
+            int column_pos =  static_cast<int>(( ent->getPos() / cfg.laneLen ) * cfg.laneCols);
+            lane[column_pos] = ent->getEnemySymb();
         }
 
         ostringstream out;
@@ -81,6 +87,8 @@ namespace renderer {
 }
 
 int main() {
+    srand(time(nullptr));
+
     Debug::init("debug.log", true);
     
     Game game;
@@ -124,21 +132,23 @@ int main() {
             // this_thread::sleep_for(std::chrono)
         }
         if (cmd == "k" || cmd == "K") {
-            game.Spawn(UnitType::Knight, game.usePlayerEconomy());
+            game.playerSpawn(UnitType::Knight);
             Debug::info("Spawned knight");
             game.update();
             Debug::info(to_string(game.usePlayerEconomy().getGold()));
         }
         if (cmd == "p" || cmd == "P") {
-            game.Spawn(UnitType::Peasant, game.usePlayerEconomy());
+            game.playerSpawn(UnitType::Peasant);
             Debug::info("Spawned peasant");
             game.update();
         }
         if (cmd == "a" || cmd == "A") {
-            game.Spawn(UnitType::Archer, game.usePlayerEconomy());
+            game.playerSpawn(UnitType::Archer);
             Debug::info("Spawned archer");
             game.update();
         }
+
+        game.AIController();
     }
     Debug::info("Closing logger");
     Debug::shutdown();

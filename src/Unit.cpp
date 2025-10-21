@@ -39,8 +39,6 @@ void Unit::update(float dt){
         return;
     }
 
-    cout << "Used this" << endl;
-
     // IF FIGHTING: ...
 
     // IF NOT FIGHTING:

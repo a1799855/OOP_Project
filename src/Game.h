@@ -37,7 +37,8 @@ public:
 
     // Getters
     // const vector<Unit>& getUnits() const { return units; }
-    const vector<Entity*>& getPlayerEntities() const { return playerEntities; } // ********
+    const vector<Entity*>& getPlayerEntities() const { return playerEntities; }
+    const vector<Entity*>& getEnemyEntities() const { return enemyEntities; }
     // E.g. to see gold count, need game.getEconomy().getGold()
     const Base& getPlayerBase() const { return playerBase; }
     const Base& getEnemyBase() const { return enemyBase; }
@@ -47,7 +48,11 @@ public:
     Economy& useEnemyEconomy() { return enemyEcon; } 
     //const Faction& getPlayerFaction() const { return playerFaction; }
     //const Faction& getEnemyFaction() const { return enemyFaction; }
-    void Spawn(UnitType uType, Economy& econ);   // **********
+    int getUniqueID();
+    void setUniqueID(int i);
+    void playerSpawn(UnitType uType);
+    void enemySpawn(UnitType uType);
+    void AIController();
     const Config& getConfig() const { return cfg; }
     string winnerText() const;
 
@@ -55,6 +60,7 @@ public:
 private:
     // Internal functions
     GameState state = GameState::MainGameScreen;
+    int uniqueID = 2;
     // void aiStep_();
     // void movementStep_();  // Currently contained in 'upgrade'
     // void combatStep_();
