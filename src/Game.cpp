@@ -7,7 +7,7 @@ using namespace std;
 Game::Game() : 
     playerBase(0, 0.0f), enemyBase(1, cfg.laneLen),
     //playerFaction(FactionType::Faction1),
-    //enemyFaction(FactionType::Faction2),
+    //enemyFaction(FactionType::Faction4),
     //playerBase(0, 0.0f, Faction(Faction1)),         // ID == 0
     //enemyBase(1, cfg.laneLen, Faction(Faction2)),   // ID == 1
     playerEcon(),
@@ -17,18 +17,6 @@ Game::Game() :
     state = GameState::MainGameScreen;
     cfg = Config{};
 }
-
-// void Game::reset() {
-// }
-
-// Removed, as economy has now been properly implemented.
-//void Game::incomeStep_() {
-//    econ.acc += econ.income_per_sec * cfg.dt;
-//    while (econ.acc >= 1.f) {
-//        econ.gold += 1;
-//        econ.acc -= 1.f;
-//    }
-//}
 
 // Purely for testing
 void Game::updateProjectiles_(float dt) {

@@ -7,7 +7,7 @@
 #include "Base.h"
 #include "Projectile.h"
 #include "Economy.h"
-
+#include "Faction.h"
 using namespace std;
 
 //enum class Faction { Player, Enemy }; // Other factions to be added later. Ideally there would be 4 factions, player would choose one and the enemy will be one of the other three
