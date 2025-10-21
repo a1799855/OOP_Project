@@ -17,8 +17,7 @@ void Faction::initializeFactionBonuses() {
     
     switch (factionType) {
         case Faction1:
-            modifiers.knightUpgraded = true;
-            modifiers.econBuildings = 0;
+            modifiers.econBuildings = 1;
             break;
         
         case Faction2:
@@ -27,8 +26,7 @@ void Faction::initializeFactionBonuses() {
             break;
         
         case Faction3:
-            modifiers.archerUpgraded = true;
-            modifiers.econBuildings = 0;
+            modifiers.econBuildings = 1;
             break;
         
         case Faction4:
