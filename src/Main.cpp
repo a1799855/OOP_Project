@@ -124,19 +124,20 @@ int main() {
             // this_thread::sleep_for(std::chrono)
         }
         if (cmd == "k" || cmd == "K") {
-            game.Spawn(UnitType::Knight);
+            game.Spawn(UnitType::Knight, game.usePlayerEconomy());
             Debug::info("Spawned knight");
-            // game.update();
+            game.update();
+            Debug::info(to_string(game.usePlayerEconomy().getGold()));
         }
         if (cmd == "p" || cmd == "P") {
-            game.Spawn(UnitType::Peasant);
+            game.Spawn(UnitType::Peasant, game.usePlayerEconomy());
             Debug::info("Spawned peasant");
-            // game.update();
+            game.update();
         }
         if (cmd == "a" || cmd == "A") {
-            game.Spawn(UnitType::Archer);
+            game.Spawn(UnitType::Archer, game.usePlayerEconomy());
             Debug::info("Spawned archer");
-            // game.update();
+            game.update();
         }
     }
     Debug::info("Closing logger");

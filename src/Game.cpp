@@ -46,16 +46,28 @@ void Game::update() {
     }
 }
 
-// **********************
-void Game::Spawn(UnitType uType){
+// Checks if economy can afford, and if so spawns in unit
+void Game::Spawn(UnitType uType, Economy& econ){
     if (uType == UnitType::Knight){
-        playerEntities.push_back(new Knight(10,0.0f));   // Temporary ID
+        int K_price = Knight(0,0.0f).getCost();
+        if (econ.getGold() >= K_price){
+            playerEntities.push_back(new Knight(10,0.0f));   // Temporary ID
+            econ.spend(K_price);
+        }
     }
     if (uType == UnitType::Peasant){
-        playerEntities.push_back(new Peasant(11,0.0f));    // Temporary ID
+        int P_price = Peasant(0,0.0f).getCost();
+        if (econ.getGold() >= P_price){
+            playerEntities.push_back(new Peasant(11,0.0f));    // Temporary ID
+            econ.spend(P_price);
+        }
     }
     if (uType == UnitType::Archer){
-        playerEntities.push_back(new Archer(12,0.0f));    // Temporary ID
+        int A_price = Archer(0,0.0f).getCost();
+        if (econ.getGold() >= A_price){
+            playerEntities.push_back(new Archer(12,0.0f));    // Temporary ID
+            econ.spend(A_price);
+        }
     }
 }
 

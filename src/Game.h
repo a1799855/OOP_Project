@@ -43,9 +43,11 @@ public:
     const Base& getEnemyBase() const { return enemyBase; }
     const Economy& getPlayerEconomy() const { return playerEcon; } // Allows to see economy
     const Economy& getEnemyEconomy() const { return enemyEcon; }
+    Economy& usePlayerEconomy() { return playerEcon; } 
+    Economy& useEnemyEconomy() { return enemyEcon; } 
     //const Faction& getPlayerFaction() const { return playerFaction; }
     //const Faction& getEnemyFaction() const { return enemyFaction; }
-    void Spawn(UnitType uType);   // **********
+    void Spawn(UnitType uType, Economy& econ);   // **********
     const Config& getConfig() const { return cfg; }
     string winnerText() const;
 
