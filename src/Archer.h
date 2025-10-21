@@ -8,9 +8,9 @@ class Archer : public Unit {
     public:
         Archer(int id, float pos);
 
-        void attack(Entity* target) override;
-        Projectile fireProjectile();
         void update(float dt) override;
+        Projectile fireProjectile(Entity* target);
+        void attack(Entity* target) override;
 };
 
 #endif
