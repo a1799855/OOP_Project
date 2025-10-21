@@ -51,6 +51,14 @@ namespace renderer {
         string lane(cfg.laneCols, '.');
         string laneBlank(cfg.laneCols, ' ');
 
+        // ***********
+        // Iterate over entities, finding position
+        for (int i = 0; i < static_cast<int>(g.getPlayerEntities().size()); i++){
+            Entity* ent = g.getPlayerEntities()[i];
+            int column_pos =  static_cast<int>(( ent->getPos() / cfg.laneLen ) * cfg.laneCols);
+            lane[column_pos] = ent->getPlayerSymb();
+        }
+
         ostringstream out;
         // Gold amount and base health display
         out << "Player [" << bar(pb.getHp(), 200, 20) << "]" << "🏰" << lane << "🏰" << "[" << bar(eb.getHp(), 200, 20) << "] Enemy\n";
@@ -58,7 +66,7 @@ namespace renderer {
         out << "Gold count:         " << playerEcon.getGold() << "\n\n";
 
         // Comtrols, prompting for expected player inputs. More dynamic input with cooldowns later on
-        out << "Controls:" << "\n" << "'p' to damage enemy" << "\n" << "'e' to damage player" << "\n" << "'n' to advance tick" << "\n" << "'q' to quit.\n";
+        out << "Controls:" << "\n" << "'d' to damage enemy" << "\n" << "'e' to damage player" << "\n" << "'p' to spawn peasant" << "\n" << "'k' to spawn knight" << "\n" << "'a' to spawn archer" << "\n" << "'n' to advance tick" << "\n" << "'q' to quit.\n";
 
         // Game over banner. To be replaced by gameState
         if (g.isGameOver()) {
@@ -99,7 +107,7 @@ int main() {
             Debug::info("Player quit the program");
             break;
         }
-        if (cmd == "p" || cmd == "P") {
+        if (cmd == "d" || cmd == "D") {
             const_cast<Base&>(game.getEnemyBase()).takeDamage(25);
             Debug::info("Enemy damaged for 25");
             game.update();
@@ -114,6 +122,21 @@ int main() {
             game.update();
             // 
             // this_thread::sleep_for(std::chrono)
+        }
+        if (cmd == "k" || cmd == "K") {
+            game.Spawn(UnitType::Knight);
+            Debug::info("Spawned knight");
+            // game.update();
+        }
+        if (cmd == "p" || cmd == "P") {
+            game.Spawn(UnitType::Peasant);
+            Debug::info("Spawned peasant");
+            // game.update();
+        }
+        if (cmd == "a" || cmd == "A") {
+            game.Spawn(UnitType::Archer);
+            Debug::info("Spawned archer");
+            // game.update();
         }
     }
     Debug::info("Closing logger");
