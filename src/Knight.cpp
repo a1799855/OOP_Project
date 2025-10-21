@@ -6,5 +6,5 @@
 // Speed == 2
 // Cost == 20
 // (Set atk_cd & atkTimer == 0 for now)
-Knight::Knight(int id, float pos) : 
-    Unit(id, 70, pos, 12, 1, 0, 0, 2, 60) {setSymb('>','<');}
+Knight::Knight(int id, float pos, int speed) : 
+    Unit(id, 70, pos, 12, 1, 0, 0, speed, 60) {setSymb('>','<');}

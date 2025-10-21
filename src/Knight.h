@@ -5,7 +5,7 @@
 
 class Knight : public Unit {
     public:
-        Knight(int id, float pos);
+        Knight(int id, float pos, int speed);
 };
 
 #endif
