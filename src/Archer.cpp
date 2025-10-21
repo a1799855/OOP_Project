@@ -34,6 +34,7 @@ void Archer::attack(Entity* target) {
         if (fabs(target->getPos() - getPos()) <= getRange()){
             Projectile p = fireProjectile(target);
             // Now add to 'projectile manager' (in Game class?)
+            // Make to not shoot if archer is in same position as enemy unit
             setAttackTimer( getAttackCooldown() );  // Reset attack cooldown timer
         }
     }
