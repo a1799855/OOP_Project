@@ -1,6 +1,10 @@
 #include <algorithm>
 #include "Game.h"
 #include "Debug.h"
+#include "Unit.h"
+#include "Knight.h"
+#include "Peasant.h"
+#include "Archer.h"
 
 using namespace std;
 
@@ -33,8 +37,25 @@ void Game::update() {
     playerEcon.update(cfg.dt);    // ** Replace when dt is properly implemented
     enemyEcon.update(cfg.dt);
     updateProjectiles_(cfg.dt);
+    for (int i = 0; i < static_cast<int>(playerEntities.size()); i++){
+        Entity* ent = playerEntities[i];
+        ent->update(cfg.dt);
+    }
     if (!playerBase.isAlive() || !enemyBase.isAlive()) {
         state = GameState::GameOver;
+    }
+}
+
+// **********************
+void Game::Spawn(UnitType uType){
+    if (uType == UnitType::Knight){
+        playerEntities.push_back(new Knight(10,0.0f));   // Temporary ID
+    }
+    if (uType == UnitType::Peasant){
+        playerEntities.push_back(new Peasant(11,0.0f));    // Temporary ID
+    }
+    if (uType == UnitType::Archer){
+        playerEntities.push_back(new Archer(12,0.0f));    // Temporary ID
     }
 }
 
