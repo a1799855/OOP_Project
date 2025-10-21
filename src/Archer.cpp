@@ -5,7 +5,7 @@
 // Archer has: HP == 20, Attack == 9, Speed == 1, Cost == 30
 // Set atk_cd & atkTimer == 0 for now
 Archer::Archer(int id, float pos) : 
-    Unit(id, 20, pos, 9, 6, 0, 0, 1, 30) {}
+    Unit(id, 20, pos, 9, 6, 0, 0, 1, 30) {setSymb('}','{');}
 
 void Archer::update(float dt) {
     Unit::update(dt);
