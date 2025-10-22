@@ -24,6 +24,7 @@ struct Config {
 class Game {
 public:
     Game();
+    ~Game();
 
     // Advances game by one tick
     void update();

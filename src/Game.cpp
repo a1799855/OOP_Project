@@ -44,6 +44,17 @@ Game::Game() :
     cfg = Config{};
 }
 
+Game::~Game(){
+    for (Entity* pEntity : playerEntities){
+        delete pEntity;
+    }
+    playerEntities.clear();
+    for (Entity* eEntity : enemyEntities){
+        delete eEntity;
+    }
+    enemyEntities.clear();
+}
+
 // Purely for testing
 void Game::updateProjectiles_(float dt) {
     for (auto& p : projectiles )
