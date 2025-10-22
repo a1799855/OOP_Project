@@ -1,35 +1,31 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-// Parent of all entities: units, projectiles & bases
-// Stores unique ID for each entity, and universal values (HP, pos etc)
-
 class Entity {
-  protected:
-    int id;            // Unique entity ID
-    int hp;            // Health of entity
-    float pos;         // Position of entity on the field
-    bool alive;        // Tracks alive/dead state of entity
-    char playerSymb;   // Symbol of entity for the player
-    char enemySymb;    // Symbol of the entity for the enemy
+ protected:
+   int id;
+   int hp;
+   float pos;    // MUST be protected for Projectile::update() to run
+   bool alive;
+   char playerSymb;
+   char enemySymb;
 
-  public:
-    Entity(int id, int hp, float pos); 
-    virtual ~Entity() = default;
+ public:
+   Entity(int id, int hp, float pos); 
+   virtual ~Entity() = default;
 
-    virtual void update(float dt);       // Defined in children
-    virtual void takeDamage(int dmg);    // Decreases HP by attack value
+   virtual void update(float dt);     
+   virtual void takeDamage(int dmg);
+   //virtual void movement(float pos);  
 
-    int getHp() const;                   // Gets HP value
-    int getID() const;                   // Gets entity ID
-    float getPos() const;                // Gets position of entity
-    char getPlayerSymb() const;          // Gets symbol of entity for the player
-    char getEnemySymb() const;           // Gets symbol of entity for the enemy
-    void setPos(float p);                // Sets the position of the entity
-    void setSymb(char a, char b);        // Sets the symbols
-    bool isAlive() const;                // Checks whether entity is alive
-
-    virtual void logging_();                      // Logs current state of entity
+   int getHp() const;
+   int getID() const;
+   float getPos() const;
+   char getPlayerSymb() const;
+   char getEnemySymb() const;
+   void setPos(float p);
+   void setSymb(char a, char b);
+   bool isAlive() const;
 };
 
 #endif

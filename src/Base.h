@@ -2,7 +2,7 @@
 #define BASE_H
 
 #include "Entity.h"
-//#include "Faction.h"
+#include "Faction.h"
 
 class Base : public Entity {
     public:

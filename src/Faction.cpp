@@ -77,39 +77,47 @@ void Faction::applyKnightModifiers(Unit* unit) {
         return;
     }
     
-    
+    // Base stats from Knight.cpp: HP=70, ATK=12, Cost=60
     float knightHpMult = 1.0f;
     float knightAtkMult = 1.0f;
-    float knightCostMult = modifiers.costMult;
+    float knightCostMult = modifiers.costMult;  // Always use current cost mult
     
     switch (factionType) {
         case Faction1:
-            knightHpMult = 1.5f;
-            knightAtkMult = 1.4f;  
+            // Knights faction - Knights get HUGE bonuses
+            knightHpMult = 1.5f;   // 70 -> 105 HP
+            knightAtkMult = 1.4f;  // 12 -> 16-17 ATK
             break;
         
         case Faction2:
+            // Economy faction - Normal knights but cheaper
             knightHpMult = 1.0f;
             knightAtkMult = 1.0f;
             break;
         
         case Faction3:
-            knightHpMult = 0.9f;   
-            knightAtkMult = 0.9f;
+            // Ranged faction - Knights are weaker
+            knightHpMult = 0.9f;   // 70 -> 63 HP
+            knightAtkMult = 0.9f;  // 12 -> 10-11 ATK
             break;
         
         case Faction4:
-            knightHpMult = modifiers.hpMult;
-            knightAtkMult = modifiers.atkMult;
+            // Balanced faction - Use base modifiers
+            knightHpMult = 1.0f;
+            knightAtkMult = 1.0f;
             break;
     }
     
+    // Apply tech upgrade bonuses if researched
     if (modifiers.knightUpgraded) {
-        knightHpMult *= 1.15f;  
-        knightAtkMult *= 1.2f;  
+        // Apply the base modifier upgrades that were added in applyTechUpgrade
+        knightHpMult *= modifiers.hpMult;   // Includes +15% from tech
+        knightAtkMult *= modifiers.atkMult; // Includes +10% from tech
+    } else {
+        // No tech, just faction bonuses
     }
     
-    
+    // Apply modifiers
     int newHp = static_cast<int>(unit->getHp() * knightHpMult);
     int newAtk = static_cast<int>(unit->getAttack() * knightAtkMult);
     int newCost = static_cast<int>(unit->getCost() * knightCostMult);
@@ -123,38 +131,46 @@ void Faction::applyPeasantModifiers(Unit* unit) {
     if (unit == nullptr) {
         return;
     }
+    
+    // Base stats from Peasant.cpp: HP=30, ATK=6, Cost=20
     float peasantHpMult = 1.0f;
     float peasantAtkMult = 1.0f;
-    float peasantCostMult = modifiers.costMult;
+    float peasantCostMult = modifiers.costMult;  // Always use current cost mult
     
     switch (factionType) {
         case Faction1:
-            peasantHpMult = 0.9f;
-            peasantAtkMult = 0.9f; 
+            // Knights faction - Peasants are weaker
+            peasantHpMult = 0.9f;   // 30 -> 27 HP
+            peasantAtkMult = 0.9f;  // 6 -> 5 ATK
             break;
         
         case Faction2:
-            peasantHpMult = 1.3f; 
-            peasantAtkMult = 1.2f; 
+            // Economy faction - Peasants are strong (workers)
+            peasantHpMult = 1.3f;   // 30 -> 39 HP
+            peasantAtkMult = 1.2f;  // 6 -> 7 ATK
             break;
         
         case Faction3:
+            // Ranged faction - Normal peasants
             peasantHpMult = 1.0f;
             peasantAtkMult = 1.0f;
             break;
         
         case Faction4:
-            peasantHpMult = modifiers.hpMult;
-            peasantAtkMult = modifiers.atkMult;
+            // Balanced faction - Use base modifiers
+            peasantHpMult = 1.0f;
+            peasantAtkMult = 1.0f;
             break;
     }
     
-
+    // Apply tech upgrade bonuses if researched
     if (modifiers.peasantUpgraded) {
-        peasantHpMult *= 1.15f;
-        peasantCostMult *= 0.9f;
+        // Apply the base modifier upgrades that were added in applyTechUpgrade
+        peasantHpMult *= modifiers.hpMult;   // Includes +15% from tech
+        // Cost already reduced in modifiers.costMult
     }
-
+    
+    // Apply modifiers
     int newHp = static_cast<int>(unit->getHp() * peasantHpMult);
     int newAtk = static_cast<int>(unit->getAttack() * peasantAtkMult);
     int newCost = static_cast<int>(unit->getCost() * peasantCostMult);
@@ -168,14 +184,14 @@ void Faction::applyArcherModifiers(Unit* unit) {
     if (unit == nullptr) {
         return;
     }
-
+    
     float archerHpMult = 1.0f;
     float archerAtkMult = 1.0f;
     float archerCostMult = modifiers.costMult;
     
     switch (factionType) {
         case Faction1:
-            archerHpMult = 0.9f;  
+            archerHpMult = 0.9f;
             archerAtkMult = 0.9f; 
             break;
         
@@ -185,20 +201,23 @@ void Faction::applyArcherModifiers(Unit* unit) {
             break;
         
         case Faction3:
-            archerHpMult = 1.4f;  
-            archerAtkMult = 1.6f; 
+            archerHpMult = 1.4f;   // 20 -> 28 HP
+            archerAtkMult = 1.6f;  // 9 -> 14-15 ATK
             break;
         
         case Faction4:
-            archerHpMult = modifiers.hpMult;
-            archerAtkMult = modifiers.atkMult;
+            archerHpMult = 1.0f;
+            archerAtkMult = 1.0f;
             break;
     }
-
+    
+    // Apply tech upgrade bonuses if researched
     if (modifiers.archerUpgraded) {
-        archerAtkMult *= 1.25f;
+        // Apply the base modifier upgrades that were added in applyTechUpgrade
+        archerAtkMult *= modifiers.atkMult;  // Includes +20% from tech
     }
-
+    
+    // Apply modifiers
     int newHp = static_cast<int>(unit->getHp() * archerHpMult);
     int newAtk = static_cast<int>(unit->getAttack() * archerAtkMult);
     int newCost = static_cast<int>(unit->getCost() * archerCostMult);

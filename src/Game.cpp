@@ -1,8 +1,6 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
-#include <fstream>
-#include <string>
 #include "Game.h"
 #include "Debug.h"
 #include "Unit.h"
@@ -31,6 +29,11 @@ void Game::setFactions(FactionType playerPick, FactionType enemyPick) {
 void Game::selectPlayerFaction(FactionType playerPick) {
     playerFaction = Faction(playerPick);
 
+    if (playerFactionInstance != nullptr) {
+        delete playerFactionInstance;
+    }
+    playerFactionInstance = new Faction(playerPick);
+
     array<FactionType, 4> allFactions{
         FactionType::Faction1, FactionType::Faction2,
         FactionType::Faction3, FactionType::Faction4
@@ -41,6 +44,11 @@ void Game::selectPlayerFaction(FactionType playerPick) {
     for (auto randomEnemy : allFactions) if (randomEnemy != playerPick) pool[enemyPool++] = randomEnemy;
     uniform_int_distribution<int> dist(0, 2);
     enemyFaction = Faction(pool[dist(rng)]);
+
+    if (enemyFactionInstance != nullptr) {
+        delete enemyFactionInstance;
+    }
+    enemyFactionInstance = new Faction(enemyFaction);
 }
 
 Game::Game() : 
@@ -50,7 +58,9 @@ Game::Game() :
     //playerBase(0, 0.0f, Faction(Faction1)),         // ID == 0
     //enemyBase(1, cfg.laneLen, Faction(Faction2)),   // ID == 1
     playerEcon(),
-    enemyEcon()
+    enemyEcon(),
+    playerFactionInstance(nullptr),
+    enemyFactionInstance(nullptr)
 {
     // Initial game state & data
     state = GameState::MainGameScreen;
@@ -58,6 +68,10 @@ Game::Game() :
 }
 
 Game::~Game() {
+
+    delete playerFactionInstance;
+    delete enemyFactionInstance;
+
     for (Entity* pEntity : playerEntities){
         delete pEntity;
     }
@@ -66,30 +80,6 @@ Game::~Game() {
         delete eEntity;
     }
     enemyEntities.clear();
-    projectiles.clear();
-}
-
-int Game::getPlayerUnitCost(UnitType t) const {
-    Faction pf = playerFaction;
-
-    switch (t) {
-        case UnitType::Peasant: {
-            Peasant temp(-1, 0.f, +1);
-            pf.applyPeasantModifiers(&temp);
-            return temp.getCost();
-        }
-        case UnitType::Archer: {
-            Archer temp(-1, 0.f, +1);
-            pf.applyArcherModifiers(&temp);
-            return temp.getCost();
-        }
-        case UnitType::Knight: {
-            Knight temp(-1, 0.f, +1);
-            pf.applyKnightModifiers(&temp);
-            return temp.getCost();
-        }
-    }
-    return 0;
 }
 
 // Purely for testing
@@ -233,8 +223,6 @@ void Game::movementStep() {
             if (other == &u) continue;
             if (!other->isAlive()) continue;
 
-            if (u.canPassAllies() && u.isFriendlyTo(*other)) continue;
-
             const float tp = other->getPos();
             const float ahead = posDir ? (tp - p) : (p - tp);
             if (ahead < 0.f) continue;
@@ -313,55 +301,112 @@ void Game::update() {
 
 // Checks if economy can afford, and if so spawns in unit
 void Game::playerSpawn(UnitType uType){
+    if (playerFactionInstance == nullptr) {
+        playerFactionInstance = new Faction(playerFaction);
+    }
     if (uType == UnitType::Knight){
-        int K_price = Knight(0,0.0f,2).getCost();
-         if (playerEcon.getGold() >= K_price){
-            playerEntities.push_back(new Knight(uniqueID,0.0f,2));
+        // Create base knight
+        Knight* knight = new Knight(uniqueID, 0.0f, 2);
+        int K_price = knight->getCost();
+        
+        // Apply faction modifiers BEFORE checking price
+        playerFactionInstance->applyKnightModifiers(knight);
+        K_price = knight->getCost();  // Get modified cost
+        
+        if (playerEcon.getGold() >= K_price){
+            playerEntities.push_back(knight);
             playerEcon.spend(K_price);
             uniqueID = uniqueID + 1;
+        } else {
+            delete knight;  // Clean up if can't afford
         }
     }
-    if (uType == UnitType::Peasant){
-        int P_price = Peasant(0,0.0f,1).getCost();
+    else if (uType == UnitType::Peasant){
+        // Create base peasant
+        Peasant* peasant = new Peasant(uniqueID, 0.0f, 1);
+        int P_price = peasant->getCost();
+        
+        // same as before, apply mods before pricecheck
+        playerFactionInstance->applyPeasantModifiers(peasant);
+        P_price = peasant->getCost();
+        
         if (playerEcon.getGold() >= P_price){
-            playerEntities.push_back(new Peasant(uniqueID,0.0f,1)); 
+            playerEntities.push_back(peasant);
             playerEcon.spend(P_price);
             uniqueID = uniqueID + 1;
+        } else {
+            delete peasant;  // memory dealloc 
         }
     }
-    if (uType == UnitType::Archer){
-        int A_price = Archer(0,0.0f,1).getCost();
+     else if (uType == UnitType::Archer){
+        // Create base archer
+        Archer* archer = new Archer(uniqueID, 0.0f, 1);
+        int A_price = archer->getCost();
+        
+        playerFactionInstance->applyArcherModifiers(archer);
+        A_price = archer->getCost();
+        
         if (playerEcon.getGold() >= A_price){
-            playerEntities.push_back(new Archer(uniqueID,0.0f,1));
+            playerEntities.push_back(archer);
             playerEcon.spend(A_price);
             uniqueID = uniqueID + 1;
+        } else {
+            delete archer; 
         }
     }
 }
 
 void Game::enemySpawn(UnitType uType){
+
+    if (enemyFactionInstance == nullptr) {
+        enemyFactionInstance = new Faction(enemyFaction);
+    }
+
     if (uType == UnitType::Knight){
-        int K_price = Knight(0,0.0f,-2).getCost();
+        // Create base knight
+        Knight* knight = new Knight(uniqueID, cfg.laneLen-1, -2);
+        int K_price = knight->getCost();
+        
+        // Apply faction modifiers BEFORE checking price
+        enemyFactionInstance->applyKnightModifiers(knight);
+        K_price = knight->getCost();  // Get modified cost
+        
         if (enemyEcon.getGold() >= K_price){
-            enemyEntities.push_back(new Knight(uniqueID,cfg.laneLen-1,-2));
+            enemyEntities.push_back(knight);
             enemyEcon.spend(K_price);
             uniqueID = uniqueID + 1;
+        } else {
+            delete knight;  // Clean up if can't afford
         }
     }
-    if (uType == UnitType::Peasant){
-        int P_price = Peasant(0,0.0f,-1).getCost();
+    else if (uType == UnitType::Peasant){
+        Peasant* peasant = new Peasant(uniqueID, cfg.laneLen-1, -1);
+        int P_price = peasant->getCost();
+        
+        enemyFactionInstance->applyPeasantModifiers(peasant);
+        P_price = peasant->getCost();
+        
         if (enemyEcon.getGold() >= P_price){
-            enemyEntities.push_back(new Peasant(uniqueID,cfg.laneLen-1,-1));
+            enemyEntities.push_back(peasant);
             enemyEcon.spend(P_price);
             uniqueID = uniqueID + 1;
+        } else {
+            delete peasant;
         }
     }
-    if (uType == UnitType::Archer){
-        int A_price = Archer(0,0.0f,-1).getCost();
+    else if (uType == UnitType::Archer){
+        Archer* archer = new Archer(uniqueID, cfg.laneLen-1, -1);
+        int A_price = archer->getCost();
+        
+        enemyFactionInstance->applyArcherModifiers(archer);
+        A_price = archer->getCost(); 
+        
         if (enemyEcon.getGold() >= A_price){
-            enemyEntities.push_back(new Archer(uniqueID,cfg.laneLen-1,-1));
+            enemyEntities.push_back(archer);
             enemyEcon.spend(A_price);
             uniqueID = uniqueID + 1;
+        } else {
+            delete archer; 
         }
     }
 }
@@ -396,34 +441,3 @@ int Game::worldToCol_(float x) const {
 
 int Game::getUniqueID(){ return uniqueID; }
 void Game::setUniqueID(int i){ uniqueID = i; }
-
-// Create log to output entire state of all entities
-void Game::allUnitlogging(){
-    // If file exists, open and delete content (trunc)
-    // If file doesn't exist, create it 
-    ofstream file("log_allUnits.txt", ios::out | ios::trunc);
-
-    // Exit function & output to debugger if log file couldn't open
-    if (!file){
-        Debug::info("Could not open log_allUnits file in Unit");
-        return;
-    }
-
-    file << "ENTITIES FOR PLAYER" << endl;
-    for (Entity* pEntity : playerEntities){
-        file << "ID: " << pEntity->getID() << endl;
-        file << "HP: " << pEntity->getHp() << endl;
-        file << "Position: " << pEntity->getPos() << endl;
-        file << "Alive? " << pEntity->isAlive() << endl;
-    }
-    file << "ENTITIES FOR ENEMY" << endl;
-    for (Entity* eEntity : enemyEntities){
-        file << "ID: " << eEntity->getID() << endl;
-        file << "HP: " << eEntity->getHp() << endl;
-        file << "Position: " << eEntity->getPos() << endl;
-        file << "Alive? " << eEntity->isAlive() << endl;
-    }
-
-    file.close();
-    Debug::info("Successfully wrote to log_allUnits file");
-}

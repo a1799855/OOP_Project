@@ -4,9 +4,6 @@
 #include "FactionModifiers.h"
 #include <string>
 
-// Forward declarations
-class Unit;
-
 enum FactionType {
     Faction1, // Westerland
     Faction2, // Easton
