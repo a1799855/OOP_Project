@@ -177,12 +177,6 @@ void Game::resolveVsEntity_(Unit& u, Entity& target, float /*size*/, float dt) {
     // Clamps but never goes backwards
     if (posDir) u.setPos(std::min(desired, stopPos));
     else u.setPos(std::max(desired, stopPos));
-
-    // Attack
-    const float dist = std::fabs(target.getPos() - u.getPos());
-    if (dist <= static_cast<float>(u.getRange())) {
-        u.attack(&target);
-    }
 }
 
 void Game::movementStep() {
