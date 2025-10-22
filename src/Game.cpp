@@ -151,7 +151,7 @@ void Game::update() {
         ent->update(cfg.dt);
     }
     enemyCombatStep(); // enemy will automatically attack each turn 
-
+    playerCombatStep();
     playerEntities.erase(
         remove_if(playerEntities.begin(), playerEntities.end(),
             [](Entity* e) { 
