@@ -70,6 +70,10 @@ namespace renderer {
         const string pf = Faction(g.playerFaction).getFactionName();
         const auto& ef = Faction(g.enemyFaction).getFactionName();
 
+        const int pCost = g.getPlayerUnitCost(UnitType::Peasant);
+        const int aCost = g.getPlayerUnitCost(UnitType::Archer);
+        const int kCost = g.getPlayerUnitCost(UnitType::Knight);
+
         // Constructs the lane that units move across
         string lane(cfg.laneCols, '.');
         string laneBlank(cfg.laneCols, ' ');
@@ -96,6 +100,15 @@ namespace renderer {
             lane[column_pos] = ent->getEnemySymb();
         }
 
+        for (const auto& p : g.getProjectiles()) {
+            // convert world x to a lane column (reuse toCol lambda already in this func)
+            int arrow = toCol(p.getPos());
+            char arrowSymb = (p.getSpeed() > 0.0f) ? '-' : '-'; // Yes, they are the same
+
+            // Avoid overwriting a unit; only draw if the cell is empty-ish
+            if (lane[arrow] == '.') lane[arrow] = arrowSymb;
+        }
+
         ostringstream out;
         // Gold amount and base health display
         out << "\n" << pf << " [" << bar(pb.getHp(), 200, 20) << "]" << "🏰" << lane << "🏰" << "[" << bar(eb.getHp(), 200, 20) << "] " << ef << "\n";
@@ -103,16 +116,11 @@ namespace renderer {
         out << "Gold count:         " << pe.getGold() << laneBlank << "Gold Count:         " << ee.getGold() << "\n\n";
 
         // Comtrols, prompting for expected player inputs. More dynamic input with cooldowns later on
-        out << "Peasant (20) Gold          [p]\n"
-            << "Archer  (30) Gold          [a]\n"
-            << "Knight  (60) Gold          [k]\n"
+        out << "Peasant (" << pCost << ") Gold          [p]\n"
+            << "Archer  (" << aCost << ") Gold          [a]\n"
+            << "Knight  (" << kCost << ") Gold          [k]\n"
             << "Upgrade menu               [m]\n"
             << "Quit                       [q]\n";
-
-        // Game over banner. To be replaced by gameState
-        if (g.isGameOver()) {
-            out << "\n=== " << g.winnerText() << " ===\n";
-        }
 
         // Debug handling; "return s;" should be what the player sees
         const string s = out.str();

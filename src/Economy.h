@@ -19,6 +19,7 @@ class Economy {
         void setIncomeRate(float inc);  // Sets rate of income increase
         int getGold() const;            // Returns amount of gold present
         float getIncomeRate() const;    // Returns rate of income
+        void logging();                 // Print entire state of object to file
 };
 
 #endif

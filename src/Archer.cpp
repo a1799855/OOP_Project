@@ -5,7 +5,7 @@
 // Archer has: HP == 20, Attack == 9, Speed == 1, Cost == 30
 // Set atk_cd & atkTimer == 0 for now
 Archer::Archer(int id, float pos, int speed) : 
-    Unit(id, 20, pos, 9, 6, 0, 0, speed, 30) {setSymb('}','{');}
+    Unit(id, 20, pos, 9, 12, 10, 0, speed, 30) {setSymb('}','{');}
 
 void Archer::update(float dt) {
     Unit::update(dt);
@@ -16,9 +16,9 @@ Projectile Archer::fireProjectile(Entity* target){
     // Finds speed and direction of projectile (**change magnitude)
     float speed;
     if ( getPos() < target->getPos() ){
-        speed = 4.0f;
+        speed = 8.0f;
     } else if ( getPos() > target->getPos() ){
-        speed = -4.0f;
+        speed = -8.0f;
     } else {
         cout << "ARCHER: Identical Position Error" << endl;
     }

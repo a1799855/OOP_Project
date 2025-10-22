@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <fstream>
+#include <string>
 #include "Game.h"
 #include "Debug.h"
 #include "Unit.h"
@@ -24,6 +26,10 @@ float Game::stopBefore_(float blockerPos, float selfSize, float blockerSize, boo
 void Game::setFactions(FactionType playerPick, FactionType enemyPick) {
     playerFaction = Faction(playerPick);
     enemyFaction = Faction(enemyPick);
+}
+
+void Game::spawnProjectile(const Projectile& p) {
+    projectiles.push_back(p);
 }
 
 void Game::selectPlayerFaction(FactionType playerPick) {
@@ -68,10 +74,9 @@ Game::Game() :
 }
 
 Game::~Game() {
-
     delete playerFactionInstance;
     delete enemyFactionInstance;
-
+    
     for (Entity* pEntity : playerEntities){
         delete pEntity;
     }
@@ -80,12 +85,87 @@ Game::~Game() {
         delete eEntity;
     }
     enemyEntities.clear();
+    projectiles.clear();
 }
 
-// Purely for testing
+int Game::getPlayerUnitCost(UnitType t) const {
+    Faction pf = playerFaction;
+
+    switch (t) {
+        case UnitType::Peasant: {
+            Peasant temp(-1, 0.f, +1);
+            pf.applyPeasantModifiers(&temp);
+            return temp.getCost();
+        }
+        case UnitType::Archer: {
+            Archer temp(-1, 0.f, +1);
+            pf.applyArcherModifiers(&temp);
+            return temp.getCost();
+        }
+        case UnitType::Knight: {
+            Knight temp(-1, 0.f, +1);
+            pf.applyKnightModifiers(&temp);
+            return temp.getCost();
+        }
+    }
+    return 0;
+}
+
+// Simple projectile update + hit detection
 void Game::updateProjectiles_(float dt) {
-    for (auto& p : projectiles )
-        if (p.isAlive()) p.update(dt);
+    const float HITBOX = 0.5f;
+
+    for (auto& p : projectiles) {
+        if (!p.isAlive()) continue;
+
+        // Swish!
+        p.update(dt);
+        if (!p.isAlive()) continue;
+
+        // Who can this projectile hit? Direction determines if player or enemy.
+        const bool fromPlayer = (p.getSpeed() > 0.0f);
+
+        // Check units
+        auto& targets = fromPlayer ? enemyEntities : playerEntities;
+        bool hitSomething = false;
+
+        for (Entity* e : targets) {
+            if (!e || !e->isAlive()) continue;
+
+            float dist = std::fabs(e->getPos() - p.getPos());
+            // Prefer the unit's own size if it has one
+            float width = HITBOX;
+            if (auto* u = dynamic_cast<Unit*>(e)) width = u->getSize();
+
+            if (dist <= width) {
+                e->takeDamage(p.getDamage());
+                // Kills projectile by "damaging" it (hp=1 => dead)
+                p.takeDamage(1);
+                hitSomething = true;
+                break;
+            }
+        }
+
+        if (hitSomething) continue;
+
+        // Check base (treat like a large target)
+        Entity& base = fromPlayer ? static_cast<Entity&>(enemyBase)
+                                  : static_cast<Entity&>(playerBase);
+        if (base.isAlive()) {
+            float distB = std::fabs(base.getPos() - p.getPos());
+            if (distB <= HITBOX) {
+                base.takeDamage(p.getDamage());
+                p.takeDamage(1);
+            }
+        }
+
+        // Kills arrows if it goes off the map. Literally because why not?
+        if (p.getPos() < 0.f || p.getPos() > cfg.laneLen) {
+            p.takeDamage(1);
+        }
+    }
+
+    // Removes dead projectiles
     projectiles.erase(
         remove_if(projectiles.begin(), projectiles.end(),
             [](const Projectile& p) { return !p.isAlive(); }),
@@ -144,12 +224,24 @@ Entity* Game::closestEnemy(Entity* attacker, bool isPlayerUnit) {
 
 void Game::playerCombatStep() {
     for (Entity* ent : playerEntities) {
-        if (!ent->isAlive()) continue;
-        
-        Unit* unit = dynamic_cast<Unit*>(ent);
-        if (unit != nullptr) {
+        if (!ent || !ent->isAlive()) continue;
+
+        if (auto* unit = dynamic_cast<Unit*>(ent)) {
             Entity* target = closestEnemy(unit, true);
-            if (target != nullptr) {
+            if (!target || !target->isAlive()) continue;
+
+            // If archer shot an arrow, with cooldown
+            if (auto* archer = dynamic_cast<Archer*>(unit)) {
+                if (archer->getAttackTimer() <= 0.0f) {
+                    const float dist = std::fabs(target->getPos() - archer->getPos());
+                    if (dist <= archer->getRange()) {
+                        Projectile p = archer->fireProjectile(target); // Sets directionality and damage
+                        spawnProjectile(p);
+                        archer->setAttackTimer(archer->getAttackCooldown());
+                    }
+                }
+            } else {
+                // Normal attack
                 unit->attack(target);
             }
         }
@@ -158,19 +250,28 @@ void Game::playerCombatStep() {
 
 void Game::enemyCombatStep() {
     for (Entity* ent : enemyEntities) {
-        if (!ent->isAlive()) continue;
-        
-        Unit* unit = dynamic_cast<Unit*>(ent);
-        if (unit != nullptr) {
+        if (!ent || !ent->isAlive()) continue;
+
+        if (auto* unit = dynamic_cast<Unit*>(ent)) {
             Entity* target = closestEnemy(unit, false);
-            if (target != nullptr) {
+            if (!target) continue;
+
+            if (auto* archer = dynamic_cast<Archer*>(unit)) {
+                if (archer->getAttackTimer() <= 0.0f) {
+                    if (std::fabs(target->getPos() - archer->getPos()) <= archer->getRange()) {
+                        Projectile p = archer->fireProjectile(target);
+                        spawnProjectile(p);
+                        archer->setAttackTimer(archer->getAttackCooldown());
+                    }
+                }
+            } else {
                 unit->attack(target);
             }
         }
     }
 }
 
-// Basically fighting and getting stuck in a queue
+// Basically stopping to fight or getting stuck in a queue
 void Game::resolveVsEntity_(Unit& u, Entity& target, float /*size*/, float dt) {
     if (!u.isAlive() || !target.isAlive()) return;
 
@@ -222,6 +323,8 @@ void Game::movementStep() {
         for (Unit* other : units) {
             if (other == &u) continue;
             if (!other->isAlive()) continue;
+
+            if (u.canPassAllies() && u.isFriendlyTo(*other)) continue;
 
             const float tp = other->getPos();
             const float ahead = posDir ? (tp - p) : (p - tp);
@@ -441,3 +544,34 @@ int Game::worldToCol_(float x) const {
 
 int Game::getUniqueID(){ return uniqueID; }
 void Game::setUniqueID(int i){ uniqueID = i; }
+
+// Create log to output entire state of all entities
+void Game::allUnitlogging(){
+    // If file exists, open and delete content (trunc)
+    // If file doesn't exist, create it 
+    ofstream file("log_allUnits.txt", ios::out | ios::trunc);
+
+    // Exit function & output to debugger if log file couldn't open
+    if (!file){
+        Debug::info("Could not open log_allUnits file in Unit");
+        return;
+    }
+
+    file << "ENTITIES FOR PLAYER" << endl;
+    for (Entity* pEntity : playerEntities){
+        file << "ID: " << pEntity->getID() << endl;
+        file << "HP: " << pEntity->getHp() << endl;
+        file << "Position: " << pEntity->getPos() << endl;
+        file << "Alive? " << pEntity->isAlive() << endl;
+    }
+    file << "ENTITIES FOR ENEMY" << endl;
+    for (Entity* eEntity : enemyEntities){
+        file << "ID: " << eEntity->getID() << endl;
+        file << "HP: " << eEntity->getHp() << endl;
+        file << "Position: " << eEntity->getPos() << endl;
+        file << "Alive? " << eEntity->isAlive() << endl;
+    }
+
+    file.close();
+    Debug::info("Successfully wrote to log_allUnits file");
+}
