@@ -77,12 +77,6 @@ void MenuController::onMainGameScreen_(Game& g, const string& in){
         g.update();
         Debug::info(to_string(g.usePlayerEconomy().getGold()));
     }
-    // Why is attacking manual?
-    else if (cmd == 'f' || cmd == 'F') {
-        g.playerCombatStep();
-        Debug::info("Player units attack!");
-        g.update();
-    }
     else if (cmd == 'n') {}
     else if (cmd == 'm') {
         g.setState(GameState::UpgradeMenu); return;
