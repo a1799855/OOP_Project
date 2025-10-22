@@ -3,21 +3,19 @@
 
 using namespace std;
 
+// Default constructor, factions start with 100 gold and accumulate at 5 gold per timestep
 Economy::Economy() : gold(100), incomeRate(5.0f), acc(0.0f) {};
 
+// Provided unit cost is within budget, subtracts cost of unit
 void Economy::spend(int cost){
-    // Assumes canAfford function has already been used
-    if (cost > gold){
-        cout << "ECONOMY: Can't afford" << endl;
+    if (cost <= gold){
+        gold = gold - cost;
     }
-    gold = gold - cost;
 }
 
-void Economy::update(float dt){
-    // Will require refinement to fit together with dt update
-    gold = gold + incomeRate;
-}
+// Apply timestep to increase the gold value by the rate of income
+void Economy::update(float dt){ gold = gold + incomeRate; }
 
-void Economy::setIncomeRate(float inc){incomeRate = inc;}
-int Economy::getGold() const {return gold;}
-float Economy::getIncomeRate() const {return incomeRate;}
+void Economy::setIncomeRate(float inc){incomeRate = inc;}   // Set rate of income
+int Economy::getGold() const {return gold;}                 // Get current amount of gold
+float Economy::getIncomeRate() const {return incomeRate;}   // Get current rate of income
