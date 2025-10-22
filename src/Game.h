@@ -39,6 +39,9 @@ public:
     void movementStep();
     void spawnPeasant(bool isPlayer);
 
+    int getPlayerUnitCost(UnitType t) const;
+    // int getEnemyUnitCost(UnitType t) const; 
+
     // GameState
     GameState getState() const { return state; }
     void setState(GameState m) { state = m; }

@@ -66,6 +66,29 @@ Game::~Game() {
     enemyEntities.clear();
 }
 
+int Game::getPlayerUnitCost(UnitType t) const {
+    Faction pf = playerFaction;
+
+    switch (t) {
+        case UnitType::Peasant: {
+            Peasant temp(-1, 0.f, +1);
+            pf.applyPeasantModifiers(&temp);
+            return temp.getCost();
+        }
+        case UnitType::Archer: {
+            Archer temp(-1, 0.f, +1);
+            pf.applyArcherModifiers(&temp);
+            return temp.getCost();
+        }
+        case UnitType::Knight: {
+            Knight temp(-1, 0.f, +1);
+            pf.applyKnightModifiers(&temp);
+            return temp.getCost();
+        }
+    }
+    return 0;
+}
+
 // Purely for testing
 void Game::updateProjectiles_(float dt) {
     for (auto& p : projectiles )
@@ -206,6 +229,8 @@ void Game::movementStep() {
         for (Unit* other : units) {
             if (other == &u) continue;
             if (!other->isAlive()) continue;
+
+            if (u.canPassAllies() && u.isFriendlyTo(*other)) continue;
 
             const float tp = other->getPos();
             const float ahead = posDir ? (tp - p) : (p - tp);

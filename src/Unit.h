@@ -37,6 +37,14 @@ class Unit : public Entity {
         virtual void update(float dt) override;
 
         virtual float getSize() const { return 0.5f; }
+
+        virtual bool canPassAllies() const { return false; }
+        //Helper
+        bool isFriendlyTo(const Entity& other) const {
+            auto otherUnit = dynamic_cast<const Unit*>(&other);
+            if (!otherUnit) return false;
+            return (getSpeed() > 0) == (otherUnit->getSpeed() > 0);
+        }
 };
 
 #endif
