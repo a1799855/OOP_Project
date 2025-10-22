@@ -91,26 +91,32 @@ class Game {
         const Config& getConfig() const { return cfg; }     // Render configuration details
         string winnerText() const;
 
-// Split purely for organisational purposes
-private:
-    // Internal functions
-    GameState state = GameState::MainGameScreen;
-    int uniqueID = 2;
-    float colToWorld_(int col) const;
-    int worldToCol_(float x) const;
-    float stopBefore_(float blockerPos, float selfSize, float blockerSize, bool positiveSpeed) const;
-    void resolveVsEntity_(Unit& u, Entity& target, float /*size*/, float dt);
-    vector<Entity*> playerEntities;  // **********
-    vector<Entity*> enemyEntities;   // **********
-    void updateProjectiles_(float dt);
-    vector<Projectile> projectiles;
+    // Split purely for organisational purposes
+    private:
+        GameState state = GameState::MainGameScreen;    
 
-    // GAME PROPERTIES
-    Config cfg{};           // Defines render configuration details
-    Economy playerEcon;     // Creates economy for player
-    Economy enemyEcon;      // Creates economy for enemy
-    Base playerBase;        // Creates base for player
-    Base enemyBase;         // Creates base for enemy
+        // INTERNAL VECTORS
+        vector<Entity*> playerEntities;         // Creates vector for player entities
+        vector<Entity*> enemyEntities;          // Creates vector for enemy entities
+        vector<Projectile> projectiles;         // Creates vector for projectiles
+
+        // INTERNAL FUNCTIONS
+        float colToWorld_(int col) const;
+        int worldToCol_(float x) const;
+        float stopBefore_(float blockerPos, float selfSize, float blockerSize, bool positiveSpeed) const;
+        void resolveVsEntity_(Unit& u, Entity& target, float /*size*/, float dt);
+        int uniqueID = 2;       // Holds value of unique ID assigned to each entity
+        
+        
+        void updateProjectiles_(float dt);      // Increments motion of projectiles
+        
+
+        // GAME PROPERTIES
+        Config cfg{};           // Defines render configuration details
+        Economy playerEcon;     // Creates economy for player
+        Economy enemyEcon;      // Creates economy for enemy
+        Base playerBase;        // Creates base for player
+        Base enemyBase;         // Creates base for enemy
 };
 
 #endif
