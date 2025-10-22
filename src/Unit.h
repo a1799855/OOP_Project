@@ -35,6 +35,8 @@ class Unit : public Entity {
         bool canAfford(int cost);
         virtual void attack(Entity* target);
         virtual void update(float dt) override;
+
+        virtual float getSize() const { return 0.5f; }
 };
 
 #endif

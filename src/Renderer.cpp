@@ -106,7 +106,6 @@ namespace renderer {
         out << "Peasant (20) Gold          [p]\n"
             << "Archer  (30) Gold          [a]\n"
             << "Knight  (60) Gold          [k]\n"
-            << "Attack!                    [f]\n"
             << "Upgrade menu               [m]\n"
             << "Quit                       [q]\n";
 

@@ -42,21 +42,10 @@ void Unit::update(float dt){
     // IF FIGHTING: ...
 
     // IF NOT FIGHTING:
-    float pos = getPos();       // Get current position of unit
-    
-    if (pos >= 0.0f && pos <= 1000.0f){
-        // If unit is not currently at a base, update to next location
-        pos = pos + ( 1.0f * getSpeed() );
-        setPos(pos);
-    } else if (pos <= 0.0f || pos >= 1000.0f) {
-        // **Damage base & do NOT update position
-    } else {
-        // **Temporary basic debug
-        cout << "Class UNIT: Unit gone beyond boundary" << endl;
-    }
 
     // Reduce attack cooldown timer
-    atkTimer = atkTimer - 0.1f;     // Make dependent on dt
+    atkTimer -= dt;
+    if (atkTimer < 0.f) atkTimer = 0.f;
 }
 
 

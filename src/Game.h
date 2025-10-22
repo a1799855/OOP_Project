@@ -36,6 +36,7 @@ public:
     Entity* closestEnemy(Entity* attacker, bool isPlayerUnit);
     void playerCombatStep();
     void enemyCombatStep();
+    void movementStep();
     void spawnPeasant(bool isPlayer);
 
     // GameState
@@ -80,6 +81,8 @@ private:
     int uniqueID = 2;
     float colToWorld_(int col) const;
     int worldToCol_(float x) const;
+    float stopBefore_(float blockerPos, float selfSize, float blockerSize, bool positiveSpeed) const;
+    void resolveVsEntity_(Unit& u, Entity& target, float /*size*/, float dt);
     vector<Entity*> playerEntities;  // **********
     vector<Entity*> enemyEntities;   // **********
     void updateProjectiles_(float dt);

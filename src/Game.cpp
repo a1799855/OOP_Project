@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include "Game.h"
 #include "Debug.h"
 #include "Unit.h"
@@ -8,6 +9,16 @@
 #include "Archer.h"
 
 using namespace std;
+
+// Gets the size for collision detection. Not for bases or projectiles.
+static inline float sizeOf(const Entity& e) {
+    if (auto u = dynamic_cast<const Unit*>(&e)) return u->getSize();
+    return 0.0f;
+}
+
+float Game::stopBefore_(float blockerPos, float selfSize, float blockerSize, bool positiveSpeed) const {
+    return positiveSpeed ? (blockerPos - (selfSize + blockerSize)) : (blockerPos + (selfSize + blockerSize));
+}
 
 // Manually selecting factions for both. Added for debugging/stretch goals
 void Game::setFactions(FactionType playerPick, FactionType enemyPick) {
@@ -44,7 +55,7 @@ Game::Game() :
     cfg = Config{};
 }
 
-Game::~Game(){
+Game::~Game() {
     for (Entity* pEntity : playerEntities){
         delete pEntity;
     }
@@ -143,6 +154,91 @@ void Game::enemyCombatStep() {
     }
 }
 
+// Basically fighting and getting stuck in a queue
+void Game::resolveVsEntity_(Unit& u, Entity& target, float /*size*/, float dt) {
+    if (!u.isAlive() || !target.isAlive()) return;
+
+    const bool posDir = (u.getSpeed() > 0);
+    const float p = u.getPos();
+    const float tp = target.getPos();
+
+    // Ignore entities behind
+    if ((posDir && tp <= p) || (!posDir && tp >= p)) {
+        u.setPos(p + static_cast<float>(u.getSpeed()) * dt);
+        return;
+    }
+
+    const float desired = p + static_cast<float>(u.getSpeed()) * dt;
+
+    const float selfSize = u.getSize();
+    const float blockerSize = sizeOf(target);
+    const float stopPos = stopBefore_(tp, selfSize, blockerSize, posDir);
+
+    // Clamps but never goes backwards
+    if (posDir) u.setPos(std::min(desired, stopPos));
+    else u.setPos(std::max(desired, stopPos));
+
+    // Attack
+    const float dist = std::fabs(target.getPos() - u.getPos());
+    if (dist <= static_cast<float>(u.getRange())) {
+        u.attack(&target);
+    }
+}
+
+void Game::movementStep() {
+    std::vector<Unit*> units;
+    units.reserve(playerEntities.size() + enemyEntities.size());
+
+    for (Entity* e : playerEntities) {
+        if (!e || !e->isAlive()) continue;
+        if (auto* u = dynamic_cast<Unit*>(e)) units.push_back(u);
+    }
+    for (Entity* e : enemyEntities) {
+        if (!e || !e->isAlive()) continue;
+        if (auto* u = dynamic_cast<Unit*>(e)) units.push_back(u);
+    }
+
+    auto moveOne = [&](Unit& u) {
+        if (!u.isAlive()) return;
+        if (u.getSpeed() == 0) return;
+
+        const bool posDir = (u.getSpeed() > 0);
+        const float p = u.getPos();
+        const float desired = p + static_cast<float>(u.getSpeed()) * cfg.dt;
+
+        Unit* best = nullptr;
+        float bestDist = 1e9f;
+
+        for (Unit* other : units) {
+            if (other == &u) continue;
+            if (!other->isAlive()) continue;
+
+            const float tp = other->getPos();
+            const float ahead = posDir ? (tp - p) : (p - tp);
+            if (ahead < 0.f) continue;
+
+            const float reach = std::fabs(desired - p) + u.getSize() + other->getSize();
+            if (ahead <= reach && ahead < bestDist) {
+                bestDist = ahead;
+                best = other;
+            }
+        }
+
+        if (!best) {
+            u.setPos(desired); // Nothing infront
+        } else {
+            resolveVsEntity_(u, *best, 0.f, cfg.dt);
+        }
+
+        // Clamps to stop them leaving
+        if (u.getPos() < 0.f) u.setPos(0.f);
+        if (u.getPos() > cfg.laneLen) u.setPos(cfg.laneLen);
+    };
+
+    for (Unit* u : units) moveOne(*u);
+}
+
+
 void Game::update() {
     //incomeStep_();
     playerEcon.update(cfg.dt);    // ** Replace when dt is properly implemented
@@ -151,6 +247,9 @@ void Game::update() {
     if (!playerBase.isAlive() || !enemyBase.isAlive()) {
         state = GameState::GameOver;
     }
+
+    movementStep();
+
     // Individually update each player entity
     for (int i = 0; i < static_cast<int>(playerEntities.size()); i++){
         Entity* ent = playerEntities[i];
@@ -161,8 +260,11 @@ void Game::update() {
         Entity* ent = enemyEntities[i];
         ent->update(cfg.dt);
     }
-    enemyCombatStep(); // enemy will automatically attack each turn 
-    playerCombatStep();
+
+    // Player advantage
+    playerCombatStep(); // player will automatically attack each turn
+    enemyCombatStep(); // enemy will automatically attack each turn
+
     playerEntities.erase(
         remove_if(playerEntities.begin(), playerEntities.end(),
             [](Entity* e) { 
@@ -185,6 +287,7 @@ void Game::update() {
         }),
         enemyEntities.end());
 }
+
 
 // Checks if economy can afford, and if so spawns in unit
 void Game::playerSpawn(UnitType uType){
