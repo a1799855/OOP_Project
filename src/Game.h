@@ -42,8 +42,14 @@ public:
     void setState(GameState m) { state = m; }
     bool isGameOver() const { return state == GameState::GameOver ; }
     // Default factions. Basically a safety net
-    FactionType playerFaction = FactionType::Faction1;
-    FactionType enemyFaction = FactionType::Faction2;
+    // FactionType playerFaction = FactionType::Faction1;
+    // FactionType enemyFaction = FactionType::Faction2;
+    Faction playerFaction;
+    Faction enemyFaction;
+    Faction& getPlayerFaction() { return playerFaction; }
+    Faction& getEnemyFaction() { return enemyFaction; }
+    const Faction& getPlayerFaction() const { return playerFaction; }
+    const Faction& getEnemyFaction() const { return enemyFaction; }
     
     void selectPlayerFaction(FactionType f);
     void setFactions(FactionType playerPick, FactionType enemyPick);
@@ -77,6 +83,7 @@ private:
     vector<Entity*> enemyEntities;   // **********
     void updateProjectiles_(float dt);
     vector<Projectile> projectiles;
+
     // Game properties
     Config cfg{};
     Economy playerEcon;

@@ -29,6 +29,7 @@ int main() {
             case GameState::StartMenu: renderer::renderStartMenu(game); break;
             case GameState::FactionSelect: renderer::renderFactionSelect(game); break;
             case GameState::MainGameScreen: renderer::renderMainGameScreen(game); break;
+            case GameState::UpgradeMenu: renderer::renderUpgradeMenu(game); break;
             case GameState::GameOver: renderer::renderGameOver(game); break;
         }
         if (!std::getline(std::cin, line)) break;

@@ -31,7 +31,7 @@ void MenuController::handle(Game& g, const string& input) {
         case GameState::StartMenu: onStartMenu_(g, input); break;
         case GameState::FactionSelect: onFactionSelect_(g, input); break;
         case GameState::MainGameScreen: onMainGameScreen_(g, input); break;
-        // case GameState::UpgradeMenu: onUpgradeMenu_(g, input); break;
+        case GameState::UpgradeMenu: onUpgradeMenu_(g, input); break;
         case GameState::GameOver: onGameOver_(g, input); break;
     }
 }
@@ -77,6 +77,7 @@ void MenuController::onMainGameScreen_(Game& g, const string& in){
         g.update();
         Debug::info(to_string(g.usePlayerEconomy().getGold()));
     }
+    // Why is attacking manual?
     else if (cmd == 'f' || cmd == 'F') {
         g.playerCombatStep();
         Debug::info("Player units attack!");
@@ -96,25 +97,55 @@ void MenuController::onMainGameScreen_(Game& g, const string& in){
 }
 
 void MenuController::onUpgradeMenu_(Game& g, const string& in){
+    auto& pe = g.usePlayerEconomy();
+    auto& pf = g.getPlayerFaction();
+    auto& pm = Faction(g.playerFaction).getModifiers();
+
     if (in.empty()) { return; }
     char cmd = firstLower(in);
     if (cmd == 'p' || cmd == 'P') {
-        g.playerSpawn(UnitType::Peasant);
-        Debug::info("Spawned peasant");
-        g.update();
+        if (!pm.peasantUpgraded && pe.getGold() >= 40) {
+            pe.spend(40);
+            pf.applyTechUpgrade("peasant");
+            Debug::info("Upgraded peasant");
+        }
+        else {
+            Debug::warn("Can't upgrade peasant. Not enough gold or already upgraded");
+        }
     }
     else if (cmd == 'a' || cmd == 'A') {
-        g.playerSpawn(UnitType::Archer);
-        Debug::info("Spawned archer");
-        g.update();
+        if (!pm.archerUpgraded && pe.getGold() >= 60) {
+            pe.spend(60);
+            pf.applyTechUpgrade("archer");
+            Debug::info("Upgraded archer");
+        }
+        else {
+            Debug::warn("Can't upgrade archer. Not enough gold or already upgraded");
+        }
     }
     else if (cmd == 'k' || cmd == 'K') {
-        g.playerSpawn(UnitType::Knight);
-        Debug::info("Spawned knight");
-        g.update();
-        Debug::info(to_string(g.usePlayerEconomy().getGold()));
+        if (!pm.knightUpgraded && pe.getGold() >= 120) {
+            pe.spend(120);
+            pf.applyTechUpgrade("knight");
+            Debug::info("Upgraded knight");
+        }
+        else {
+            Debug::warn("Can't upgrade knight. Not enough gold or already upgraded");
+        }
     }
-    else if (cmd == 'm' || cmd == 'M') {
+    else if (cmd == 'e' || cmd == 'E') {
+        if (pe.getGold() >= 100) {
+            pe.spend(100);
+            pf.applyTechUpgrade("economy");
+            Debug::info("Upgraded economy");
+        }
+        else {
+            Debug::warn("Can't upgrade economy. Not enough gold");
+        }
+    } else if (cmd == 'q' || cmd == 'Q'){
+        exit(0);
+    }
+   else if (cmd == 'm' || cmd == 'M') {
         g.setState(GameState::MainGameScreen);
     }
 }

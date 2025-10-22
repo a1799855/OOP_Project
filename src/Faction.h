@@ -24,6 +24,9 @@ private:
 public:
     explicit Faction(FactionType type);
 
+    // Added for upgrades
+    Faction();
+
     ~Faction();
 
     FactionType getFactionType() const;

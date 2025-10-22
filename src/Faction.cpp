@@ -7,6 +7,11 @@ Faction::Faction(FactionType type) : factionType(type) {
     initializeFactionBonuses();
 }
 
+Faction::Faction() : factionType(Faction1) { //Default constructor, with Faction1 as default.
+    modifiers.name = getFactionName();
+    initializeFactionBonuses();
+}
+
 Faction::~Faction() {
 }
 

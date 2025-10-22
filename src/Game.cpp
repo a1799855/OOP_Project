@@ -11,12 +11,12 @@ using namespace std;
 
 // Manually selecting factions for both. Added for debugging/stretch goals
 void Game::setFactions(FactionType playerPick, FactionType enemyPick) {
-    playerFaction = playerPick;
-    enemyFaction = enemyPick;
+    playerFaction = Faction(playerPick);
+    enemyFaction = Faction(enemyPick);
 }
 
 void Game::selectPlayerFaction(FactionType playerPick) {
-    playerFaction = playerPick;
+    playerFaction = Faction(playerPick);
 
     array<FactionType, 4> allFactions{
         FactionType::Faction1, FactionType::Faction2,
@@ -27,7 +27,7 @@ void Game::selectPlayerFaction(FactionType playerPick) {
     int enemyPool = 0;
     for (auto randomEnemy : allFactions) if (randomEnemy != playerPick) pool[enemyPool++] = randomEnemy;
     uniform_int_distribution<int> dist(0, 2);
-    enemyFaction = pool[dist(rng)];
+    enemyFaction = Faction(pool[dist(rng)]);
 }
 
 Game::Game() : 
@@ -174,8 +174,6 @@ void Game::update() {
         }),
         enemyEntities.end());
 }
-
-    
 
 // Checks if economy can afford, and if so spawns in unit
 void Game::playerSpawn(UnitType uType){
