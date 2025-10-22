@@ -90,6 +90,7 @@ class Game {
         // OTHER
         const Config& getConfig() const { return cfg; }     // Render configuration details
         string winnerText() const;
+        void allUnitlogging();
 
     // Split purely for organisational purposes
     private:

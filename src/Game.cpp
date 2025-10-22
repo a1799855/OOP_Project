@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <fstream>
+#include <string>
 #include "Game.h"
 #include "Debug.h"
 #include "Unit.h"
@@ -64,6 +66,7 @@ Game::~Game() {
         delete eEntity;
     }
     enemyEntities.clear();
+    projectiles.clear();
 }
 
 int Game::getPlayerUnitCost(UnitType t) const {
@@ -393,3 +396,34 @@ int Game::worldToCol_(float x) const {
 
 int Game::getUniqueID(){ return uniqueID; }
 void Game::setUniqueID(int i){ uniqueID = i; }
+
+// Create log to output entire state of all entities
+void Game::allUnitlogging(){
+    // If file exists, open and delete content (trunc)
+    // If file doesn't exist, create it 
+    ofstream file("log_allUnits.txt", ios::out | ios::trunc);
+
+    // Exit function & output to debugger if log file couldn't open
+    if (!file){
+        Debug::info("Could not open log_allUnits file in Unit");
+        return;
+    }
+
+    file << "ENTITIES FOR PLAYER" << endl;
+    for (Entity* pEntity : playerEntities){
+        file << "ID: " << pEntity->getID() << endl;
+        file << "HP: " << pEntity->getHp() << endl;
+        file << "Position: " << pEntity->getPos() << endl;
+        file << "Alive? " << pEntity->isAlive() << endl;
+    }
+    file << "ENTITIES FOR ENEMY" << endl;
+    for (Entity* eEntity : enemyEntities){
+        file << "ID: " << eEntity->getID() << endl;
+        file << "HP: " << eEntity->getHp() << endl;
+        file << "Position: " << eEntity->getPos() << endl;
+        file << "Alive? " << eEntity->isAlive() << endl;
+    }
+
+    file.close();
+    Debug::info("Successfully wrote to log_allUnits file");
+}
