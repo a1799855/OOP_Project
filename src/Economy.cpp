@@ -31,7 +31,7 @@ void Economy::logging(){
 
     // Exit function & output to debugger if log file couldn't open
     if (!file){
-        Debug::print("Could not open log file in Economy");
+        Debug::info("Could not open log file in Economy");
         return;
     }
 
@@ -40,5 +40,5 @@ void Economy::logging(){
     file << "Accumulation value: " << acc << endl;
 
     file.close();
-    Debug::print("Successfully wrote to Economy log file");
+    Debug::info("Successfully wrote to Economy log file");
 }
